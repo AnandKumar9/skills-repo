@@ -1,0 +1,1 @@
+Refer /Users/anandkumar/.codeium/windsurf/skills/swift-remove-debug-prints
