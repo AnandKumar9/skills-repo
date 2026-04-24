@@ -1,0 +1,22 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+
+const skillsDir = path.resolve("../skills");
+
+const skills = fs
+  .readdirSync(skillsDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort();
+---
+
+<main>
+  <h1>Skills</h1>
+
+  <ul>
+    {skills.map((skill) => (
+      <li>{skill}</li>
+    ))}
+  </ul>
+</main>
