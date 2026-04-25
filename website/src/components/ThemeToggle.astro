@@ -1,0 +1,183 @@
+<div class="theme-control">
+  <button type="button" data-theme-toggle data-mode="system" aria-label="Theme: System">
+    <span class="icon icon-system" aria-hidden="true">
+      <svg viewBox="0 0 24 24" role="img">
+        <path d="M12 3v2.25" />
+        <path d="M12 18.75V21" />
+        <path d="M3 12h2.25" />
+        <path d="M18.75 12H21" />
+        <path d="m5.64 5.64 1.59 1.59" />
+        <path d="m16.77 16.77 1.59 1.59" />
+        <path d="m18.36 5.64-1.59 1.59" />
+        <path d="m7.23 16.77-1.59 1.59" />
+        <circle cx="12" cy="12" r="4" />
+      </svg>
+    </span>
+    <span class="icon icon-light" aria-hidden="true">
+      <svg viewBox="0 0 24 24" role="img">
+        <circle cx="12" cy="12" r="4.5" />
+        <path d="M12 2.5v2" />
+        <path d="M12 19.5v2" />
+        <path d="M4.25 4.25 5.7 5.7" />
+        <path d="m18.3 18.3 1.45 1.45" />
+        <path d="M2.5 12h2" />
+        <path d="M19.5 12h2" />
+        <path d="m4.25 19.75 1.45-1.45" />
+        <path d="m18.3 5.7 1.45-1.45" />
+      </svg>
+    </span>
+    <span class="icon icon-dark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" role="img">
+        <path d="M20.5 14.4A7.8 7.8 0 0 1 9.6 3.5 8.7 8.7 0 1 0 20.5 14.4Z" />
+      </svg>
+    </span>
+    <span class="mode-label">System</span>
+  </button>
+</div>
+
+<script is:inline>
+  (() => {
+    const storageKey = "theme-preference";
+    const modes = ["system", "light", "dark"];
+    const labels = {
+      system: "System",
+      light: "Light",
+      dark: "Dark",
+    };
+
+    const getMode = () => {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        return modes.includes(stored) ? stored : "system";
+      } catch {
+        return "system";
+      }
+    };
+
+    const applyMode = (mode) => {
+      if (mode === "system") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.dataset.theme = mode;
+      }
+    };
+
+    const updateButtons = (mode) => {
+      document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        const label = button.querySelector(".mode-label");
+        if (label) label.textContent = labels[mode];
+        button.setAttribute("aria-label", `Theme: ${labels[mode]}`);
+        button.setAttribute("title", `Theme: ${labels[mode]}`);
+        button.dataset.mode = mode;
+      });
+    };
+
+    const setMode = (mode) => {
+      try {
+        if (mode === "system") {
+          localStorage.removeItem(storageKey);
+        } else {
+          localStorage.setItem(storageKey, mode);
+        }
+      } catch {
+        // Ignore storage failures and keep the in-page theme change.
+      }
+
+      applyMode(mode);
+      updateButtons(mode);
+    };
+
+    const boot = () => {
+      const mode = getMode();
+      applyMode(mode);
+      updateButtons(mode);
+
+      document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const currentMode = getMode();
+          const nextMode =
+            modes[(modes.indexOf(currentMode) + 1) % modes.length];
+          setMode(nextMode);
+        });
+      });
+    };
+
+    applyMode(getMode());
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot, { once: true });
+    } else {
+      boot();
+    }
+  })();
+</script>
+
+<style>
+  .theme-control {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 28px;
+  }
+
+  button {
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    justify-content: center;
+    line-height: 1;
+    min-height: 2.5rem;
+    min-width: 7rem;
+    padding: 0.7rem 0.85rem;
+  }
+
+  button:hover {
+    border-color: var(--border-hover);
+    color: var(--accent-hover);
+    box-shadow: var(--card-shadow);
+  }
+
+  button:focus-visible {
+    border-color: var(--accent);
+    outline: 3px solid var(--focus-ring);
+  }
+
+  .icon {
+    display: none;
+    height: 1.15rem;
+    margin-right: 0.45rem;
+    flex: 0 0 auto;
+    width: 1.15rem;
+  }
+
+  button[data-mode="system"] .icon-system,
+  button[data-mode="light"] .icon-light,
+  button[data-mode="dark"] .icon-dark {
+    display: block;
+  }
+
+  svg {
+    display: block;
+    fill: none;
+    height: 100%;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+    width: 100%;
+  }
+
+  svg * {
+    fill: none;
+    stroke: currentColor;
+  }
+
+  .mode-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+</style>

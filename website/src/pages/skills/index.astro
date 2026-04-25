@@ -1,6 +1,8 @@
 ---
 import fs from "node:fs";
 import path from "node:path";
+import ThemeToggle from "../../components/ThemeToggle.astro";
+import "../../styles/theme.css";
 
 const skillsDir = path.resolve("../skills");
 
@@ -13,7 +15,10 @@ const skills = fs
 <meta charset="utf-8" />
 
 <main class="page">
-  <a class="back" href="/">&larr; Home</a>
+  <div class="page-tools">
+    <a class="back" href="/">&larr; Home</a>
+    <ThemeToggle />
+  </div>
 
   <section class="hero">
     <h1>Skills</h1>
@@ -31,26 +36,6 @@ const skills = fs
 </main>
 
 <style>
-  :global(:root) {
-    color-scheme: light;
-    --bg: #f8fafc;
-    --surface: #ffffff;
-    --text: #1f2933;
-    --muted: #667085;
-    --border: #d9e0e8;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-  }
-
-  :global(body) {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family:
-      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", sans-serif;
-  }
-
   .page {
     max-width: 1000px;
     margin: 0 auto;
@@ -61,6 +46,17 @@ const skills = fs
     color: var(--accent);
     text-decoration: none;
     font-size: 0.95rem;
+  }
+
+  .page-tools {
+    align-items: start;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .page-tools :global(.theme-control) {
+    margin-bottom: 0;
   }
 
   .hero {
@@ -100,9 +96,9 @@ const skills = fs
   }
 
   .card:hover {
-    border-color: #b8c2cc;
+    border-color: var(--border-hover);
     color: var(--accent-hover);
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    box-shadow: var(--card-shadow);
   }
 
   .icon {
