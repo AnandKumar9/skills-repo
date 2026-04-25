@@ -38,17 +38,20 @@
 <script is:inline>
   (() => {
     const storageKey = "theme-preference";
-    const modes = ["system", "light", "dark"];
     const labels = {
       system: "System",
       light: "Light",
       dark: "Dark",
     };
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const getResolvedSystemMode = () => (media.matches ? "dark" : "light");
+    const getOppositeMode = (mode) => (mode === "dark" ? "light" : "dark");
 
     const getMode = () => {
       try {
         const stored = localStorage.getItem(storageKey);
-        return modes.includes(stored) ? stored : "system";
+        return stored === "light" || stored === "dark" ? stored : "system";
       } catch {
         return "system";
       }
@@ -63,11 +66,17 @@
     };
 
     const updateButtons = (mode) => {
+      const resolvedSystemMode = getResolvedSystemMode();
+      const visibleLabel =
+        mode === "system"
+          ? `System (${labels[resolvedSystemMode]})`
+          : labels[mode];
+
       document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
         const label = button.querySelector(".mode-label");
-        if (label) label.textContent = labels[mode];
-        button.setAttribute("aria-label", `Theme: ${labels[mode]}`);
-        button.setAttribute("title", `Theme: ${labels[mode]}`);
+        if (label) label.textContent = visibleLabel;
+        button.setAttribute("aria-label", `Theme: ${visibleLabel}`);
+        button.setAttribute("title", `Theme: ${visibleLabel}`);
         button.dataset.mode = mode;
       });
     };
@@ -96,13 +105,22 @@
         button.addEventListener("click", () => {
           const currentMode = getMode();
           const nextMode =
-            modes[(modes.indexOf(currentMode) + 1) % modes.length];
+            currentMode === "system"
+              ? getOppositeMode(getResolvedSystemMode())
+              : "system";
           setMode(nextMode);
         });
       });
     };
 
     applyMode(getMode());
+
+    media.addEventListener("change", () => {
+      const mode = getMode();
+      if (mode === "system") {
+        updateButtons(mode);
+      }
+    });
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", boot, { once: true });
