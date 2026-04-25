@@ -1,13 +1,10 @@
 ---
-import ThemeToggle from "../components/ThemeToggle.astro";
+import PageHeading from "../components/PageHeading.astro";
 import "../styles/theme.css";
 ---
 
 <main class="home">
-  <div class="page-heading">
-    <h1>DCI Skills Repository</h1>
-    <ThemeToggle />
-  </div>
+  <PageHeading isHome />
 
   <input placeholder="Search" />
 
@@ -23,29 +20,6 @@ import "../styles/theme.css";
     margin: 0 auto;
     padding: 64px 24px;
     text-align: left;
-  }
-
-  .page-heading {
-    align-items: center;
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .page-heading :global(.theme-control) {
-    flex: 0 0 auto;
-    margin-bottom: 0;
-  }
-
-  h1 {
-    flex: 1 1 auto;
-    margin: 0;
-    min-width: 0;
-    font-size: 2.25rem;
-    line-height: 1.1;
-    font-weight: 650;
-    letter-spacing: 0;
   }
 
   input {

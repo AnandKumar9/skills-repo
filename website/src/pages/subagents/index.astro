@@ -1,12 +1,12 @@
 ---
 import fs from "node:fs";
 import path from "node:path";
-import ThemeToggle from "../../components/ThemeToggle.astro";
+import PageHeading from "../../components/PageHeading.astro";
 import "../../styles/theme.css";
 
 const subagentsDir = path.resolve("../subagents");
 
-const items = fs
+const subagents = fs
   .readdirSync(subagentsDir, { withFileTypes: true })
   .filter((entry) => {
     if (entry.isDirectory()) return true;
@@ -18,15 +18,21 @@ const items = fs
 ---
 
 <main class="page">
-  <ThemeToggle />
+  <PageHeading />
 
-  <h1>Subagents</h1>
+  <section class="hero">
+    <h1>Subagents</h1>
+    <p>Browse all subagent folders and markdown files from the repo.</p>
+  </section>
 
-  <ul class="list">
-    {items.map((item) => (
-      <li>{item}</li>
+  <section class="grid">
+    {subagents.map((subagent) => (
+      <a class="card" href="#">
+        <span class="icon">&#9881;</span>
+        <span>{subagent}</span>
+      </a>
     ))}
-  </ul>
+  </section>
 </main>
 
 <style>
@@ -36,28 +42,51 @@ const items = fs
     padding: 64px 24px;
   }
 
-  h1 {
-    margin: 0 0 32px;
-    font-size: 2rem;
+  .hero {
+    margin: 32px 0 36px;
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-size: 1.75rem;
     line-height: 1.15;
     font-weight: 650;
     letter-spacing: 0;
   }
 
-  .list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
-  li {
-    padding: 1rem 1.125rem;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    padding: 1.25rem;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: var(--surface);
+    text-decoration: none;
     color: var(--text);
+    background: var(--surface);
+    box-shadow: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  }
+
+  .card:hover {
+    border-color: var(--border-hover);
+    color: var(--accent-hover);
+    box-shadow: var(--card-shadow);
+  }
+
+  .icon {
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
   }
 </style>

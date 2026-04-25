@@ -1,7 +1,7 @@
 ---
 import fs from "node:fs";
 import path from "node:path";
-import ThemeToggle from "../../components/ThemeToggle.astro";
+import PageHeading from "../../components/PageHeading.astro";
 import "../../styles/theme.css";
 
 const skillsDir = path.resolve("../skills");
@@ -15,10 +15,7 @@ const skills = fs
 <meta charset="utf-8" />
 
 <main class="page">
-  <div class="page-tools">
-    <a class="back" href="/">&larr; Home</a>
-    <ThemeToggle />
-  </div>
+  <PageHeading />
 
   <section class="hero">
     <h1>Skills</h1>
@@ -42,30 +39,13 @@ const skills = fs
     padding: 64px 24px;
   }
 
-  .back {
-    color: var(--accent);
-    text-decoration: none;
-    font-size: 0.95rem;
-  }
-
-  .page-tools {
-    align-items: start;
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .page-tools :global(.theme-control) {
-    margin-bottom: 0;
-  }
-
   .hero {
     margin: 32px 0 36px;
   }
 
-  h1 {
+  .hero h1 {
     margin: 0;
-    font-size: 2rem;
+    font-size: 1.75rem;
     line-height: 1.15;
     font-weight: 650;
     letter-spacing: 0;

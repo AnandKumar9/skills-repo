@@ -1,0 +1,64 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  isHome?: boolean;
+}
+
+const { isHome = false } = Astro.props;
+const title = "DCI Skills Repository";
+---
+
+<div class="page-heading">
+  {
+    isHome ? (
+      <h1>{title}</h1>
+    ) : (
+      <a class="site-title" href="/" aria-label="Go to home page">
+        {title}
+      </a>
+    )
+  }
+  <ThemeToggle />
+</div>
+
+<style>
+  .page-heading {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .page-heading :global(.theme-control) {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+  }
+
+  h1,
+  .site-title {
+    flex: 1 1 auto;
+    margin: 0;
+    min-width: 0;
+    font-size: 2.25rem;
+    line-height: 1.1;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+
+  .site-title {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .site-title:hover {
+    color: var(--accent-hover);
+  }
+
+  .site-title:focus-visible {
+    border-radius: 6px;
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 4px;
+  }
+</style>
