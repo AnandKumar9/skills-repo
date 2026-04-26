@@ -1,0 +1,144 @@
+<div class="search-view-controls" aria-label="Search and view controls">
+  <label class="search-field">
+    <span class="sr-only">Search</span>
+    <input type="search" placeholder="Search" />
+  </label>
+
+  <div class="view-toggle" aria-label="View mode">
+    <button class="view-toggle-button is-active" type="button" aria-pressed="true" aria-label="Grid view">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
+        />
+      </svg>
+    </button>
+    <button class="view-toggle-button" type="button" aria-pressed="false" aria-label="List view">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .search-view-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: -8px 0 32px;
+  }
+
+  .search-field {
+    flex: 0 1 66.666%;
+    min-width: 240px;
+  }
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 44px;
+    padding: 0 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+  }
+
+  input::placeholder {
+    color: var(--muted);
+  }
+
+  input:focus {
+    border-color: var(--accent);
+    outline: 3px solid var(--focus-ring);
+  }
+
+  .view-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+
+  .view-toggle-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .view-toggle-button:hover,
+  .view-toggle-button:focus-visible {
+    color: var(--accent-hover);
+  }
+
+  .view-toggle-button:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .view-toggle-button.is-active {
+    color: var(--text);
+    background: var(--bg);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .view-toggle-button svg {
+    display: block;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 640px) {
+    .search-view-controls {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .search-field {
+      flex-basis: auto;
+      min-width: 0;
+    }
+
+    .view-toggle {
+      align-self: flex-start;
+    }
+  }
+</style>

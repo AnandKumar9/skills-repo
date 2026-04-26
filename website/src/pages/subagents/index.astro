@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 import PageHeading from "../../components/PageHeading.astro";
+import SearchViewControls from "../../components/SearchViewControls.astro";
 import "../../styles/theme.css";
 
 const pageDir = path.dirname(fileURLToPath(import.meta.url));
@@ -51,6 +52,8 @@ const subagents = fs
 
 <main class="page">
   <PageHeading pageTitle="Subagents" pageDescription="Browse all subagent folders and markdown files from the repo." />
+
+  <SearchViewControls />
 
   <section class="grid">
     {subagents.map((subagent) => (

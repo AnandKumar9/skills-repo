@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 import PageHeading from "../../components/PageHeading.astro";
+import SearchViewControls from "../../components/SearchViewControls.astro";
 import "../../styles/theme.css";
 
 const pageDir = path.dirname(fileURLToPath(import.meta.url));
@@ -48,6 +49,8 @@ const skills = fs
 
 <main class="page">
   <PageHeading pageTitle="Skills" pageDescription="Browse all skill folders from the repo." />
+
+  <SearchViewControls />
 
   <section class="grid">
     {skills.map((skill) => (

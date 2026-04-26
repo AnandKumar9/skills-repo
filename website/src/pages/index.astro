@@ -1,12 +1,13 @@
 ---
 import PageHeading from "../components/PageHeading.astro";
+import SearchViewControls from "../components/SearchViewControls.astro";
 import "../styles/theme.css";
 ---
 
 <main class="home">
   <PageHeading isHome />
 
-  <input placeholder="Search" />
+  <SearchViewControls />
 
   <div class="cards">
     <a href="/skills/">Skills</a>
@@ -20,27 +21,6 @@ import "../styles/theme.css";
     margin: 0 auto;
     padding: 64px 24px;
     text-align: left;
-  }
-
-  input {
-    width: min(100%, 520px);
-    box-sizing: border-box;
-    padding: 0.75rem 0.875rem;
-    margin: 28px 0 32px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text);
-    font: inherit;
-  }
-
-  input::placeholder {
-    color: var(--muted);
-  }
-
-  input:focus {
-    border-color: var(--accent);
-    outline: 3px solid var(--focus-ring);
   }
 
   .cards {
