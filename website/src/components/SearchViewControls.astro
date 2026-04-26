@@ -1,36 +1,115 @@
-<div class="search-view-controls" aria-label="Search and view controls">
+---
+interface Props {
+  showViewToggle?: boolean;
+}
+
+const { showViewToggle = true } = Astro.props;
+---
+
+<div class="search-view-controls" data-search-view-controls aria-label="Search and view controls">
   <label class="search-field">
     <span class="sr-only">Search</span>
     <input type="search" placeholder="Search" />
   </label>
 
-  <div class="view-toggle" aria-label="View mode">
-    <button class="view-toggle-button is-active" type="button" aria-pressed="true" aria-label="Grid view">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
-        />
-      </svg>
-    </button>
-    <button class="view-toggle-button" type="button" aria-pressed="false" aria-label="List view">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
-        />
-      </svg>
-    </button>
-  </div>
+  {
+    showViewToggle && (
+      <div class="view-toggle" aria-label="View mode">
+        <button
+          class="view-toggle-button is-active"
+          type="button"
+          data-view-mode-button="grid"
+          aria-pressed="true"
+          aria-label="Grid view"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
+            />
+          </svg>
+        </button>
+        <button
+          class="view-toggle-button"
+          type="button"
+          data-view-mode-button="list"
+          aria-pressed="false"
+          aria-label="List view"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
+            />
+          </svg>
+        </button>
+      </div>
+    )
+  }
 </div>
+
+<script>
+  const viewModeStorageKey = "skills-repo:view-mode";
+
+  document.querySelectorAll<HTMLElement>("[data-search-view-controls]").forEach((controls) => {
+    const page = controls.closest("main");
+    const viewContainer = page?.querySelector<HTMLElement>("[data-view-container]");
+    const buttons = controls.querySelectorAll<HTMLButtonElement>("[data-view-mode-button]");
+
+    if (!viewContainer || buttons.length === 0) return;
+
+    function isViewMode(mode: string): mode is "grid" | "list" {
+      return mode === "grid" || mode === "list";
+    }
+
+    function getStoredViewMode() {
+      try {
+        const storedMode = window.localStorage.getItem(viewModeStorageKey);
+        return storedMode && isViewMode(storedMode) ? storedMode : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function storeViewMode(mode: string) {
+      try {
+        window.localStorage.setItem(viewModeStorageKey, mode);
+      } catch {
+        // Ignore storage failures so the toggle still works in private or restricted contexts.
+      }
+    }
+
+    function setViewMode(mode: string, shouldStore = true) {
+      viewContainer.dataset.viewMode = mode;
+
+      buttons.forEach((button) => {
+        const isActive = button.dataset.viewModeButton === mode;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      if (shouldStore) {
+        storeViewMode(mode);
+      }
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setViewMode(button.dataset.viewModeButton ?? "grid");
+      });
+    });
+
+    setViewMode(getStoredViewMode() ?? viewContainer.dataset.viewMode ?? "grid", false);
+  });
+</script>
 
 <style>
   .search-view-controls {

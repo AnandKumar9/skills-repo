@@ -55,7 +55,7 @@ const subagents = fs
 
   <SearchViewControls />
 
-  <section class="grid">
+  <section class="grid" data-view-container data-view-mode="grid">
     {subagents.map((subagent) => (
       <article class="card">
         <div class="card-content">
@@ -108,6 +108,17 @@ const subagents = fs
     gap: 1rem;
   }
 
+  .grid[data-view-mode="list"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+
   .card {
     box-sizing: border-box;
     min-width: 300px;
@@ -124,10 +135,46 @@ const subagents = fs
     transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   }
 
+  .grid[data-view-mode="list"] .card {
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    grid-template-columns: minmax(0, 1fr) 76px;
+    grid-template-rows: 1fr;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .grid[data-view-mode="list"] .card-content {
+    display: grid;
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .grid[data-view-mode="list"] .card h2 {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .card:hover {
     border-color: var(--border-hover);
     color: var(--accent-hover);
     box-shadow: var(--card-shadow);
+  }
+
+  .grid[data-view-mode="list"] .card:hover {
+    border-color: var(--border);
+    border-bottom-color: var(--border);
+    color: var(--text);
+    background: var(--bg);
+    box-shadow: none;
   }
 
   .card-content {
@@ -155,6 +202,14 @@ const subagents = fs
     overflow: hidden;
   }
 
+  .grid[data-view-mode="list"] .card p {
+    display: block;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .card-footer {
     box-sizing: border-box;
     display: flex;
@@ -164,6 +219,14 @@ const subagents = fs
     height: 36px;
     padding: 0 1rem;
     background: var(--surface);
+  }
+
+  .grid[data-view-mode="list"] .card-footer {
+    align-self: stretch;
+    width: 76px;
+    height: auto;
+    padding: 0 1rem 0 0;
+    background: transparent;
   }
 
   .footer-icon-link {
@@ -191,6 +254,20 @@ const subagents = fs
 
     .card {
       min-width: 0;
+    }
+
+    .grid[data-view-mode="list"] .card {
+      height: 56px;
+    }
+
+    .grid[data-view-mode="list"] .card-content {
+      display: block;
+      padding: 0.625rem 1rem;
+    }
+
+    .grid[data-view-mode="list"] .card h2 {
+      width: auto;
+      margin-bottom: 0.25rem;
     }
   }
 </style>
