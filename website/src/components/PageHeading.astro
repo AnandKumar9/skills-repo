@@ -3,32 +3,58 @@ import ThemeToggle from "./ThemeToggle.astro";
 
 interface Props {
   isHome?: boolean;
+  pageTitle?: string;
+  pageDescription?: string;
 }
 
-const { isHome = false } = Astro.props;
-const title = "DCI Skills Repository";
+const { isHome = false, pageTitle, pageDescription } = Astro.props;
+const siteTitle = "DCI Skills Repository";
+const homeDescription =
+  "A collection of various AI skills, agents, hooks, context files, and other tools developed and used within DCI.";
 ---
 
 <div class="page-heading">
+  <div class="heading-row">
+    {
+      isHome ? (
+        <h1>{siteTitle}</h1>
+      ) : (
+        <a class="site-title" href="/" aria-label="Go to home page">
+          {siteTitle}
+        </a>
+      )
+    }
+    <ThemeToggle />
+  </div>
+
   {
     isHome ? (
-      <h1>{title}</h1>
+      <p class="heading-description">{homeDescription}</p>
     ) : (
-      <a class="site-title" href="/" aria-label="Go to home page">
-        {title}
-      </a>
+      pageTitle && (
+        <div class="page-copy">
+          <h1>{pageTitle}</h1>
+          {pageDescription && <p class="heading-description">{pageDescription}</p>}
+        </div>
+      )
     )
   }
-  <ThemeToggle />
 </div>
 
 <style>
   .page-heading {
+    background: var(--heading-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 36px;
+    padding: 24px;
+  }
+
+  .heading-row {
     align-items: center;
     display: flex;
     gap: 1rem;
     justify-content: space-between;
-    margin-bottom: 12px;
   }
 
   .page-heading :global(.theme-control) {
@@ -45,6 +71,23 @@ const title = "DCI Skills Repository";
     line-height: 1.1;
     font-weight: 650;
     letter-spacing: 0;
+  }
+
+  .page-copy {
+    margin-top: 32px;
+  }
+
+  .page-copy h1 {
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .heading-description {
+    margin: 0.75rem 0 0;
+    max-width: 720px;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
   .site-title {

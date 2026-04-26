@@ -2,6 +2,7 @@
   color-scheme: light dark;
   --bg: #f8fafc;
   --surface: #ffffff;
+  --heading-bg: #eaf6ff;
   --text: #1f2933;
   --muted: #667085;
   --border: #d9e0e8;
@@ -16,6 +17,7 @@
   :root {
     --bg: #111827;
     --surface: #182235;
+    --heading-bg: #172f46;
     --text: #eef2f7;
     --muted: #a8b3c5;
     --border: #344055;
@@ -31,6 +33,7 @@
   color-scheme: light;
   --bg: #f8fafc;
   --surface: #ffffff;
+  --heading-bg: #eaf6ff;
   --text: #1f2933;
   --muted: #667085;
   --border: #d9e0e8;
@@ -45,6 +48,7 @@
   color-scheme: dark;
   --bg: #111827;
   --surface: #182235;
+  --heading-bg: #172f46;
   --text: #eef2f7;
   --muted: #a8b3c5;
   --border: #344055;

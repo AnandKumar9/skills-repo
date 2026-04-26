@@ -18,12 +18,7 @@ const subagents = fs
 ---
 
 <main class="page">
-  <PageHeading />
-
-  <section class="hero">
-    <h1>Subagents</h1>
-    <p>Browse all subagent folders and markdown files from the repo.</p>
-  </section>
+  <PageHeading pageTitle="Subagents" pageDescription="Browse all subagent folders and markdown files from the repo." />
 
   <section class="grid">
     {subagents.map((subagent) => (
@@ -40,25 +35,6 @@ const subagents = fs
     max-width: 1000px;
     margin: 0 auto;
     padding: 64px 24px;
-  }
-
-  .hero {
-    margin: 32px 0 36px;
-  }
-
-  .hero h1 {
-    margin: 0;
-    font-size: 1.75rem;
-    line-height: 1.15;
-    font-weight: 650;
-    letter-spacing: 0;
-  }
-
-  p {
-    margin: 10px 0 0;
-    color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.5;
   }
 
   .grid {
