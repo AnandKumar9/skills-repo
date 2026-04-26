@@ -104,7 +104,9 @@ const {
     }
 
     function getSearchText(item: HTMLElement) {
-      return `${item.dataset.searchName ?? ""} ${item.dataset.searchDescription ?? ""}`.toLowerCase();
+      return `${item.dataset.searchName ?? ""} ${item.dataset.searchDescription ?? ""} ${
+        item.dataset.searchTags ?? ""
+      }`.toLowerCase();
     }
 
     function formatResultCount(count: number) {
@@ -132,8 +134,8 @@ const {
       if (searchStatus) {
         searchStatus.textContent =
           query.length === 0
-            ? `${formatResultCount(visibleCount)} shown in ${currentView} view.`
-            : `${formatResultCount(visibleCount)} found for "${searchInput.value.trim()}" in ${currentView} view.`;
+            ? `${formatResultCount(visibleCount)} shown`
+            : `${formatResultCount(visibleCount)} found for "${searchInput.value.trim()}"`;
       }
 
       if (emptyState) {

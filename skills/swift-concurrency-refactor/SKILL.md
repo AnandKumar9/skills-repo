@@ -1,6 +1,7 @@
 ---
 name: swift-concurrency-refactor
 description: Refactor Swift code to use async/await and actors safely
+tags: iOS
 tools: [codebase, edit]
 ---
 
