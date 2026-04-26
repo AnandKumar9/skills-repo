@@ -50,7 +50,9 @@ const skills = fs
 <main class="page">
   <PageHeading pageTitle="Skills" pageDescription="Browse all skill folders from the repo." />
 
-  <SearchViewControls />
+  <SearchViewControls searchPlaceholder="Search skills" resultLabelSingular="skill" resultLabelPlural="skills" />
+
+  <p class="search-status" data-search-status aria-live="polite"></p>
 
   <section class="grid" data-view-container data-view-mode="grid">
     {skills.map((skill) => (
@@ -61,6 +63,9 @@ const skills = fs
         data-skill-card
         data-skill-name={skill.name}
         data-skill-description={skill.description}
+        data-search-item
+        data-search-name={skill.name}
+        data-search-description={skill.description}
         aria-label={`View details for ${skill.name}`}
       >
         <div class="card-content">
@@ -98,6 +103,8 @@ const skills = fs
       </article>
     ))}
   </section>
+
+  <p class="empty-state" data-search-empty hidden>No skills match that search.</p>
 
   <dialog class="skill-dialog" aria-labelledby="skill-dialog-title">
     <div class="dialog-panel">
@@ -203,6 +210,23 @@ const skills = fs
     gap: 1rem;
   }
 
+  .search-status {
+    min-height: 1.25rem;
+    margin: -20px 0 16px;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .empty-state {
+    margin: 1rem 0 0;
+    padding: 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+
   .grid[data-view-mode="list"] {
     display: flex;
     flex-direction: column;
@@ -229,6 +253,10 @@ const skills = fs
     grid-template-rows: minmax(0, 1fr) 36px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
     cursor: pointer;
+  }
+
+  .card[hidden] {
+    display: none;
   }
 
   .grid[data-view-mode="list"] .card {

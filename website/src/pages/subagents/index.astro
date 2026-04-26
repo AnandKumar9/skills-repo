@@ -53,11 +53,22 @@ const subagents = fs
 <main class="page">
   <PageHeading pageTitle="Subagents" pageDescription="Browse all subagent folders and markdown files from the repo." />
 
-  <SearchViewControls />
+  <SearchViewControls
+    searchPlaceholder="Search subagents"
+    resultLabelSingular="subagent"
+    resultLabelPlural="subagents"
+  />
+
+  <p class="search-status" data-search-status aria-live="polite"></p>
 
   <section class="grid" data-view-container data-view-mode="grid">
     {subagents.map((subagent) => (
-      <article class="card">
+      <article
+        class="card"
+        data-search-item
+        data-search-name={subagent.name}
+        data-search-description={subagent.description}
+      >
         <div class="card-content">
           <h2>{subagent.name}</h2>
           {subagent.description && <p>{subagent.description}</p>}
@@ -93,6 +104,8 @@ const subagents = fs
       </article>
     ))}
   </section>
+
+  <p class="empty-state" data-search-empty hidden>No subagents match that search.</p>
 </main>
 
 <style>
@@ -106,6 +119,23 @@ const subagents = fs
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1rem;
+  }
+
+  .search-status {
+    min-height: 1.25rem;
+    margin: -20px 0 16px;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .empty-state {
+    margin: 1rem 0 0;
+    padding: 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    background: var(--surface);
   }
 
   .grid[data-view-mode="list"] {
@@ -133,6 +163,10 @@ const subagents = fs
     display: grid;
     grid-template-rows: minmax(0, 1fr) 36px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  }
+
+  .card[hidden] {
+    display: none;
   }
 
   .grid[data-view-mode="list"] .card {

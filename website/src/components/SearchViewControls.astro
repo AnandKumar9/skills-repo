@@ -1,15 +1,29 @@
 ---
 interface Props {
+  resultLabelPlural?: string;
+  resultLabelSingular?: string;
+  searchPlaceholder?: string;
   showViewToggle?: boolean;
 }
 
-const { showViewToggle = true } = Astro.props;
+const {
+  resultLabelPlural = "items",
+  resultLabelSingular = "item",
+  searchPlaceholder = "Search",
+  showViewToggle = true,
+} = Astro.props;
 ---
 
-<div class="search-view-controls" data-search-view-controls aria-label="Search and view controls">
+<div
+  class="search-view-controls"
+  data-search-view-controls
+  data-result-label-singular={resultLabelSingular}
+  data-result-label-plural={resultLabelPlural}
+  aria-label="Search and view controls"
+>
   <label class="search-field">
     <span class="sr-only">Search</span>
-    <input type="search" placeholder="Search" />
+    <input type="search" placeholder={searchPlaceholder} data-search-input />
   </label>
 
   {
@@ -62,9 +76,11 @@ const { showViewToggle = true } = Astro.props;
   document.querySelectorAll<HTMLElement>("[data-search-view-controls]").forEach((controls) => {
     const page = controls.closest("main");
     const viewContainer = page?.querySelector<HTMLElement>("[data-view-container]");
+    const searchInput = controls.querySelector<HTMLInputElement>("[data-search-input]");
+    const searchItems = page?.querySelectorAll<HTMLElement>("[data-search-item]");
+    const searchStatus = page?.querySelector<HTMLElement>("[data-search-status]");
+    const emptyState = page?.querySelector<HTMLElement>("[data-search-empty]");
     const buttons = controls.querySelectorAll<HTMLButtonElement>("[data-view-mode-button]");
-
-    if (!viewContainer || buttons.length === 0) return;
 
     function isViewMode(mode: string): mode is "grid" | "list" {
       return mode === "grid" || mode === "list";
@@ -87,7 +103,47 @@ const { showViewToggle = true } = Astro.props;
       }
     }
 
+    function getSearchText(item: HTMLElement) {
+      return `${item.dataset.searchName ?? ""} ${item.dataset.searchDescription ?? ""}`.toLowerCase();
+    }
+
+    function formatResultCount(count: number) {
+      const singular = controls.dataset.resultLabelSingular ?? "item";
+      const plural = controls.dataset.resultLabelPlural ?? "items";
+      return `${count} ${count === 1 ? singular : plural}`;
+    }
+
+    function updateSearchResults() {
+      if (!searchInput || !searchItems) return;
+
+      const query = searchInput.value.trim().toLowerCase();
+      const currentView = viewContainer?.dataset.viewMode ?? "grid";
+      let visibleCount = 0;
+
+      searchItems.forEach((item) => {
+        const isVisible = query.length === 0 || getSearchText(item).includes(query);
+        item.hidden = !isVisible;
+
+        if (isVisible) {
+          visibleCount += 1;
+        }
+      });
+
+      if (searchStatus) {
+        searchStatus.textContent =
+          query.length === 0
+            ? `${formatResultCount(visibleCount)} shown in ${currentView} view.`
+            : `${formatResultCount(visibleCount)} found for "${searchInput.value.trim()}" in ${currentView} view.`;
+      }
+
+      if (emptyState) {
+        emptyState.hidden = visibleCount > 0;
+      }
+    }
+
     function setViewMode(mode: string, shouldStore = true) {
+      if (!viewContainer || buttons.length === 0) return;
+
       viewContainer.dataset.viewMode = mode;
 
       buttons.forEach((button) => {
@@ -99,15 +155,22 @@ const { showViewToggle = true } = Astro.props;
       if (shouldStore) {
         storeViewMode(mode);
       }
+
+      updateSearchResults();
     }
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => {
-        setViewMode(button.dataset.viewModeButton ?? "grid");
+    if (viewContainer && buttons.length > 0) {
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setViewMode(button.dataset.viewModeButton ?? "grid");
+        });
       });
-    });
 
-    setViewMode(getStoredViewMode() ?? viewContainer.dataset.viewMode ?? "grid", false);
+      setViewMode(getStoredViewMode() ?? viewContainer.dataset.viewMode ?? "grid", false);
+    }
+
+    searchInput?.addEventListener("input", updateSearchResults);
+    updateSearchResults();
   });
 </script>
 
