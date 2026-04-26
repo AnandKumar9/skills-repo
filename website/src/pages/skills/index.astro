@@ -1,16 +1,48 @@
 ---
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import yaml from "js-yaml";
 import PageHeading from "../../components/PageHeading.astro";
 import "../../styles/theme.css";
 
-const skillsDir = path.resolve("../skills");
+const pageDir = path.dirname(fileURLToPath(import.meta.url));
+const skillsDir = path.resolve(pageDir, "../../../../skills");
+
+function getSkillDescription(skillPath: string) {
+  const markdown = fs.readFileSync(skillPath, "utf-8");
+  const frontmatter = markdown.match(/^---\s*\n([\s\S]*?)\n---/);
+
+  if (!frontmatter) {
+    return "";
+  }
+
+  const metadata = yaml.load(frontmatter[1]);
+
+  if (
+    metadata &&
+    typeof metadata === "object" &&
+    "description" in metadata &&
+    typeof metadata.description === "string"
+  ) {
+    return metadata.description.trim();
+  }
+
+  return "";
+}
 
 const skills = fs
   .readdirSync(skillsDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort();
+  .map((entry) => {
+    const skillPath = path.join(skillsDir, entry.name, "SKILL.md");
+
+    return {
+      name: entry.name,
+      description: fs.existsSync(skillPath) ? getSkillDescription(skillPath) : "",
+    };
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
 ---
 <meta charset="utf-8" />
 
@@ -19,13 +51,141 @@ const skills = fs
 
   <section class="grid">
     {skills.map((skill) => (
-      <a class="card" href="#">
-        <span class="icon">&#129504;</span>
-        <span>{skill}</span>
-      </a>
+      <article
+        class="card"
+        role="button"
+        tabindex="0"
+        data-skill-card
+        data-skill-name={skill.name}
+        data-skill-description={skill.description}
+        aria-label={`View details for ${skill.name}`}
+      >
+        <div class="card-content">
+          <h2>{skill.name}</h2>
+          {skill.description && <p>{skill.description}</p>}
+        </div>
+        <footer class="card-footer">
+          <a
+            class="footer-icon-link"
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open GitHub"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.15c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.92 10.92 0 0 1 12 6.05c.98 0 1.95.13 2.87.38 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.82 1.19 3.08 0 4.42-2.69 5.39-5.25 5.68.42.36.78 1.07.78 2.16v3.14c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"
+              />
+            </svg>
+          </a>
+          <a class="footer-icon-link" href="#" aria-label={`Download ${skill.name}`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
+              />
+            </svg>
+          </a>
+        </footer>
+      </article>
     ))}
   </section>
+
+  <dialog class="skill-dialog" aria-labelledby="skill-dialog-title">
+    <div class="dialog-panel">
+      <div class="dialog-content">
+        <button class="dialog-close" type="button" data-dialog-close aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m6 6 12 12M18 6 6 18"
+            />
+          </svg>
+        </button>
+        <h2 id="skill-dialog-title"></h2>
+        <p id="skill-dialog-description"></p>
+      </div>
+      <footer class="card-footer dialog-footer">
+        <a
+          class="footer-icon-link"
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open GitHub"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.15c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.92 10.92 0 0 1 12 6.05c.98 0 1.95.13 2.87.38 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.82 1.19 3.08 0 4.42-2.69 5.39-5.25 5.68.42.36.78 1.07.78 2.16v3.14c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"
+            />
+          </svg>
+        </a>
+        <a class="footer-icon-link" href="#" data-dialog-download aria-label="Download skill">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
+            />
+          </svg>
+        </a>
+      </footer>
+    </div>
+  </dialog>
 </main>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>(".skill-dialog");
+  const dialogTitle = document.querySelector<HTMLElement>("#skill-dialog-title");
+  const dialogDescription = document.querySelector<HTMLElement>("#skill-dialog-description");
+  const closeButton = document.querySelector<HTMLButtonElement>("[data-dialog-close]");
+  const dialogDownload = document.querySelector<HTMLAnchorElement>("[data-dialog-download]");
+
+  function openSkillDialog(card: HTMLElement) {
+    if (!dialog || !dialogTitle || !dialogDescription) return;
+
+    const skillName = card.dataset.skillName ?? "";
+    dialogTitle.textContent = skillName;
+    dialogDescription.textContent = card.dataset.skillDescription || "No description provided.";
+    dialogDownload?.setAttribute("aria-label", `Download ${skillName}`);
+    dialog.showModal();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-skill-card]").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).closest(".footer-icon-link")) return;
+      openSkillDialog(card);
+    });
+
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      if ((event.target as HTMLElement).closest(".footer-icon-link")) return;
+
+      event.preventDefault();
+      openSkillDialog(card);
+    });
+  });
+
+  closeButton?.addEventListener("click", () => dialog?.close());
+
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+</script>
 
 <style>
   .page {
@@ -36,30 +196,187 @@ const skills = fs
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, 260px);
     gap: 1rem;
+    justify-content: start;
   }
 
   .card {
-    padding: 1.25rem;
+    box-sizing: border-box;
+    width: 260px;
+    height: 180px;
     border: 1px solid var(--border);
     border-radius: 8px;
     text-decoration: none;
     color: var(--text);
     background: var(--surface);
     box-shadow: none;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 36px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+    cursor: pointer;
   }
 
-  .card:hover {
+  .card:hover,
+  .card:focus-visible {
     border-color: var(--border-hover);
     color: var(--accent-hover);
     box-shadow: var(--card-shadow);
   }
 
-  .icon {
+  .card:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .card-content {
+    min-height: 0;
+    padding: 1.25rem 1.25rem 0.875rem;
+    overflow: hidden;
+  }
+
+  .card h2 {
+    margin: 0 0 0.75rem;
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .card p {
+    display: -webkit-box;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.925rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.625rem;
+    height: 36px;
+    padding: 0 1rem;
+    background: var(--surface);
+  }
+
+  .footer-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .footer-icon-link svg {
     display: block;
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
+    flex: 0 0 auto;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .skill-dialog {
+    width: min(420px, calc(100vw - 32px));
+    min-height: min(300px, calc(100vh - 48px));
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+    border-radius: 8px;
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+  }
+
+  .skill-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.48);
+  }
+
+  .dialog-panel {
+    min-height: inherit;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 44px;
+  }
+
+  .dialog-content {
+    position: relative;
+    min-height: 0;
+    padding: 1.75rem;
+    overflow: auto;
+  }
+
+  .dialog-footer {
+    height: 44px;
+    border-top: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+  }
+
+  .dialog-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: var(--bg);
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+  }
+
+  .dialog-close:hover,
+  .dialog-close:focus-visible {
+    color: var(--accent-hover);
+    border-color: var(--border-hover);
+    background: var(--surface);
+  }
+
+  .dialog-close:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .dialog-close svg {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .skill-dialog h2 {
+    margin: 0;
+    padding-right: 2.75rem;
+    color: var(--text);
+    font-size: 1.35rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .skill-dialog p {
+    margin: 1rem 0 0;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      width: 100%;
+    }
   }
 </style>
