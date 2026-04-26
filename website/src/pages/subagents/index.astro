@@ -3,8 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
 import { getDeclaredTags, getMarkdownMetadata, getRepoPath } from "../../lib/repoContent.mjs";
-import "../../styles/theme.css";
 
 const subagentsDir = getRepoPath("subagents");
 const declaredTags = getDeclaredTags();
@@ -32,18 +32,19 @@ const subagents = fs
   .sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<main class="page">
-  <PageHeading pageTitle="Subagents" pageDescription="Browse all subagent folders and markdown files from the repo." />
+<SiteLayout>
+  <main class="page">
+    <PageHeading pageTitle="Subagents" pageDescription="Browse all subagent folders and markdown files from the repo." />
 
-  <SearchViewControls
-    searchPlaceholder="Search subagents"
-    resultLabelSingular="subagent"
-    resultLabelPlural="subagents"
-  />
+    <SearchViewControls
+      searchPlaceholder="Search subagents"
+      resultLabelSingular="subagent"
+      resultLabelPlural="subagents"
+    />
 
-  <p class="search-status" data-search-status aria-live="polite"></p>
+    <p class="search-status" data-search-status aria-live="polite"></p>
 
-  <section class="grid" data-view-container data-view-mode="grid">
+    <section class="grid" data-view-container data-view-mode="grid">
     {subagents.map((subagent) => (
       <article
         class="card"
@@ -99,16 +100,16 @@ const subagents = fs
         </footer>
       </article>
     ))}
-  </section>
+    </section>
 
-  <p class="empty-state" data-search-empty hidden>No subagents match that search.</p>
-</main>
+    <p class="empty-state" data-search-empty hidden>No subagents match that search.</p>
+  </main>
+</SiteLayout>
 
 <style>
   .page {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 64px 24px;
   }
 
   .grid {

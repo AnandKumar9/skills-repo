@@ -1,0 +1,115 @@
+---
+const navItems = [
+  { label: "Project Forge", href: "/project-forge/" },
+  { label: "Home", href: "/" },
+  { label: "Skills", href: "/skills/" },
+  { label: "Subagents", href: "/subagents/" },
+  { label: "Tags", href: "/tags/" },
+];
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string) {
+  if (href === "/") {
+    return currentPath === "/";
+  }
+
+  return currentPath === href || currentPath.startsWith(href);
+}
+---
+
+<aside class="sidebar" aria-label="Primary navigation">
+  <nav>
+    <ul>
+      {
+        navItems.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</aside>
+
+<style>
+  .sidebar {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    box-sizing: border-box;
+    width: 220px;
+    max-height: calc(100vh - 48px);
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+    overflow: auto;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    padding: 0.625rem 0.75rem;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-decoration: none;
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--accent-hover);
+    background: var(--bg);
+  }
+
+  a:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  a[aria-current="page"] {
+    color: var(--text);
+    background: var(--heading-bg);
+  }
+
+  @media (max-width: 800px) {
+    .sidebar {
+      position: static;
+      width: 100%;
+      max-height: none;
+      overflow: visible;
+    }
+
+    ul {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    a {
+      padding: 0.625rem 0.5rem;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 560px) {
+    ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    a {
+      text-align: left;
+    }
+  }
+</style>

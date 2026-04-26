@@ -1,25 +1,26 @@
 ---
 import PageHeading from "../components/PageHeading.astro";
 import SearchViewControls from "../components/SearchViewControls.astro";
-import "../styles/theme.css";
+import SiteLayout from "../layouts/SiteLayout.astro";
 ---
 
-<main class="home">
-  <PageHeading isHome />
+<SiteLayout>
+  <main class="home">
+    <PageHeading isHome />
 
-  <SearchViewControls showViewToggle={false} />
+    <SearchViewControls showViewToggle={false} />
 
-  <div class="cards">
-    <a href="/skills/">Skills</a>
-    <a href="/subagents/">Subagents</a>
-  </div>
-</main>
+    <div class="cards">
+      <a href="/skills/">Skills</a>
+      <a href="/subagents/">Subagents</a>
+    </div>
+  </main>
+</SiteLayout>
 
 <style>
   .home {
     max-width: 960px;
     margin: 0 auto;
-    padding: 64px 24px;
     text-align: left;
   }
 

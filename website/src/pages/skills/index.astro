@@ -3,8 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
 import { getDeclaredTags, getMarkdownMetadata, getRepoPath } from "../../lib/repoContent.mjs";
-import "../../styles/theme.css";
 
 const skillsDir = getRepoPath("skills");
 const declaredTags = getDeclaredTags();
@@ -26,14 +26,15 @@ const skills = fs
 ---
 <meta charset="utf-8" />
 
-<main class="page">
-  <PageHeading pageTitle="Skills" pageDescription="Browse all skill folders from the repo." />
+<SiteLayout>
+  <main class="page">
+    <PageHeading pageTitle="Skills" pageDescription="Browse all skill folders from the repo." />
 
-  <SearchViewControls searchPlaceholder="Search skills" resultLabelSingular="skill" resultLabelPlural="skills" />
+    <SearchViewControls searchPlaceholder="Search skills" resultLabelSingular="skill" resultLabelPlural="skills" />
 
-  <p class="search-status" data-search-status aria-live="polite"></p>
+    <p class="search-status" data-search-status aria-live="polite"></p>
 
-  <section class="grid" data-view-container data-view-mode="grid">
+    <section class="grid" data-view-container data-view-mode="grid">
     {skills.map((skill) => (
       <article
         class="card"
@@ -96,11 +97,11 @@ const skills = fs
         </footer>
       </article>
     ))}
-  </section>
+    </section>
 
-  <p class="empty-state" data-search-empty hidden>No skills match that search.</p>
+    <p class="empty-state" data-search-empty hidden>No skills match that search.</p>
 
-  <dialog class="skill-dialog" aria-labelledby="skill-dialog-title">
+    <dialog class="skill-dialog" aria-labelledby="skill-dialog-title">
     <div class="dialog-panel">
       <div class="dialog-content">
         <button class="dialog-close" type="button" data-dialog-close aria-label="Close">
@@ -152,8 +153,9 @@ const skills = fs
         </div>
       </footer>
     </div>
-  </dialog>
-</main>
+    </dialog>
+  </main>
+</SiteLayout>
 
 <script>
   const dialog = document.querySelector<HTMLDialogElement>(".skill-dialog");
@@ -210,7 +212,6 @@ const skills = fs
   .page {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 64px 24px;
   }
 
   .grid {

@@ -1,0 +1,61 @@
+---
+import PageHeading from "../../components/PageHeading.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { getDeclaredTags } from "../../lib/repoContent.mjs";
+
+const tags = getDeclaredTags();
+---
+
+<SiteLayout>
+  <main class="page">
+    <PageHeading pageTitle="Tags" pageDescription="Browse declared tags from the repo." />
+
+    {
+      tags.length > 0 ? (
+        <ul class="tag-grid" aria-label="Tags">
+          {tags.map((tag) => (
+            <li>{tag}</li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty-state">No tags are declared yet.</p>
+      )
+    }
+  </main>
+</SiteLayout>
+
+<style>
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag-grid li {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+
+  .empty-state {
+    margin: 0;
+    padding: 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+</style>
