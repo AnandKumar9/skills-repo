@@ -196,14 +196,13 @@ const skills = fs
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 300px);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1rem;
-    justify-content: start;
   }
 
   .card {
     box-sizing: border-box;
-    width: 300px;
+    min-width: 300px;
     height: 180px;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -376,7 +375,7 @@ const skills = fs
     }
 
     .card {
-      width: 100%;
+      min-width: 0;
     }
   }
 </style>
