@@ -2,8 +2,12 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+const configuredBase = process.env.ASTRO_BASE ?? '/dci-ai-skills';
+const base = configuredBase.endsWith('/') ? configuredBase : `${configuredBase}/`;
+
 // https://astro.build/config
 export default defineConfig({
+	base,
 	integrations: [
 		starlight({
 			title: 'My Docs',

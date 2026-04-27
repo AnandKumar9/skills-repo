@@ -9,6 +9,7 @@ interface Props {
 
 const { isHome = false, pageTitle, pageDescription } = Astro.props;
 const siteTitle = "DCI Skills Repository";
+const homeHref = import.meta.env.BASE_URL;
 ---
 
 <div class="page-heading">
@@ -17,7 +18,7 @@ const siteTitle = "DCI Skills Repository";
       isHome ? (
         <h1>{siteTitle}</h1>
       ) : (
-        <a class="site-title" href="/" aria-label="Go to home page">
+        <a class="site-title" href={homeHref} aria-label="Go to home page">
           {siteTitle}
         </a>
       )

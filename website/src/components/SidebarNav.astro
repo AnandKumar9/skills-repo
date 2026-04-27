@@ -1,4 +1,8 @@
 ---
+const baseUrl = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
 const navItems = [
   { label: "Project Forge", href: "/project-forge/" },
   { label: "Home", href: "/" },
@@ -9,12 +13,22 @@ const navItems = [
 
 const currentPath = Astro.url.pathname;
 
-function isActive(href: string) {
+function withBase(href: string) {
   if (href === "/") {
-    return currentPath === "/";
+    return baseUrl;
   }
 
-  return currentPath === href || currentPath.startsWith(href);
+  return `${baseUrl}${href.replace(/^\/+/, "")}`;
+}
+
+function isActive(href: string) {
+  const basedHref = withBase(href);
+
+  if (basedHref === baseUrl) {
+    return currentPath === basedHref;
+  }
+
+  return currentPath === basedHref || currentPath.startsWith(basedHref);
 }
 ---
 
@@ -24,7 +38,7 @@ function isActive(href: string) {
       {
         navItems.map((item) => (
           <li>
-            <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+            <a href={withBase(item.href)} aria-current={isActive(item.href) ? "page" : undefined}>
               {item.label}
             </a>
           </li>
