@@ -48,6 +48,16 @@ function isActive(href: string) {
 
 <aside class="sidebar" aria-label="Primary navigation">
   <nav class="sidebar-stack">
+    <a class="sidebar-logo-card" href={withBase("/")} aria-label="Go to home page">
+      <svg class="site-icon" viewBox="0 0 64 64" role="img" aria-label="Site icon">
+        <rect width="64" height="64" rx="14" fill="#1f6feb" />
+        <path
+          d="M20 18h16a8 8 0 0 1 0 16H20V18Zm8 8v0h8a0 0 0 0 0 0 0h-8Zm-8 12h20a8 8 0 0 1 0 16H20V38Zm8 8v0h12a0 0 0 0 0 0 0H28Z"
+          fill="#fff"
+        />
+        <circle cx="46" cy="18" r="6" fill="#facc15" />
+      </svg>
+    </a>
     {
       navSections.map((section, index) => (
         <section class="sidebar-card" aria-label={`Navigation section ${index + 1}`}>
@@ -113,6 +123,19 @@ function isActive(href: string) {
     box-shadow: var(--card-shadow);
   }
 
+  .sidebar-logo-card {
+    justify-content: center;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    background: var(--heading-bg);
+    box-shadow: var(--card-shadow);
+  }
+
+  .site-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
   ul {
     display: grid;
     gap: 0.25rem;
@@ -156,6 +179,11 @@ function isActive(href: string) {
   a[aria-current="page"] {
     color: var(--text);
     background: var(--heading-bg);
+  }
+
+  .sidebar-logo-card:hover,
+  .sidebar-logo-card:focus-visible {
+    background: var(--surface);
   }
 
   @media (max-width: 800px) {
