@@ -85,6 +85,32 @@ function normalizeAuthor(value) {
   return /^[A-Za-z]{3}\d{3}$/.test(author) ? author : "";
 }
 
+function normalizeMarkdownAuthors(metadata) {
+  if ("author" in metadata && typeof metadata.author === "string") {
+    return metadata.author.trim();
+  }
+
+  if ("authors" in metadata) {
+    if (typeof metadata.authors === "string") {
+      return metadata.authors
+        .split(",")
+        .map((author) => author.trim())
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    if (Array.isArray(metadata.authors)) {
+      return metadata.authors
+        .filter((author) => typeof author === "string")
+        .map((author) => author.trim())
+        .filter(Boolean)
+        .join(", ");
+    }
+  }
+
+  return "";
+}
+
 function normalizeContentUpdateEntry(entry) {
   if (entry instanceof Date || typeof entry === "string") {
     return {
@@ -175,11 +201,13 @@ export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags
 
   if (!metadata || typeof metadata !== "object") {
     return {
+      author: "",
       description: "",
       tags: [],
     };
   }
 
+  const author = normalizeMarkdownAuthors(metadata);
   const description =
     "description" in metadata && typeof metadata.description === "string" ? metadata.description.trim() : "";
 
@@ -188,6 +216,7 @@ export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags
     .filter(Boolean);
 
   return {
+    author,
     description,
     tags: [...new Set(tags)],
   };
@@ -205,13 +234,14 @@ export function getSkills() {
       const skillPath = path.join(skillsDir, entry.name, "SKILL.md");
       const metadata = fs.existsSync(skillPath)
         ? getMarkdownMetadata(skillPath, declaredTags)
-        : { description: "", tags: [] };
+        : { author: "", description: "", tags: [] };
+      const contentEntry = getContentEntry("skills", entry.name, updates);
 
       return {
         name: entry.name,
         description: metadata.description,
         tags: metadata.tags,
-        author: getContentEntry("skills", entry.name, updates).author,
+        author: metadata.author || contentEntry.author,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -234,13 +264,14 @@ export function getSubagents() {
       const metadata =
         entry.isFile() && entry.name.endsWith(".md")
           ? getMarkdownMetadata(subagentPath, declaredTags)
-          : { description: "", tags: [] };
+          : { author: "", description: "", tags: [] };
+      const contentEntry = getContentEntry("subagents", entry.name, updates);
 
       return {
         name: entry.name,
         description: metadata.description,
         tags: metadata.tags,
-        author: getContentEntry("subagents", entry.name, updates).author,
+        author: metadata.author || contentEntry.author,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

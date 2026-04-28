@@ -4,6 +4,7 @@ description: "Use this agent when you want to review recently written or modifie
 tools: Glob, Grep, Read, WebFetch, WebSearch
 model: sonnet
 memory: user
+author: "Paz715"
 tags: Swift, Code Review
 ---
 

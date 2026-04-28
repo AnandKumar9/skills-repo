@@ -14,6 +14,7 @@
         </svg>
       </button>
       <h2 id="skill-dialog-title"></h2>
+      <p id="skill-dialog-author" class="dialog-author" hidden></p>
       <p id="skill-dialog-description"></p>
     </div>
     <footer class="card-footer dialog-footer">
@@ -55,6 +56,7 @@
 <script>
   const dialog = document.querySelector<HTMLDialogElement>(".skill-dialog");
   const dialogTitle = document.querySelector<HTMLElement>("#skill-dialog-title");
+  const dialogAuthor = document.querySelector<HTMLElement>("#skill-dialog-author");
   const dialogDescription = document.querySelector<HTMLElement>("#skill-dialog-description");
   const dialogTags = document.querySelector<HTMLElement>("[data-dialog-tags]");
   const closeButton = document.querySelector<HTMLButtonElement>("[data-dialog-close]");
@@ -64,11 +66,16 @@
     if (!dialog || !dialogTitle || !dialogDescription) return;
 
     const skillName = card.dataset.skillName ?? "";
+    const author = card.dataset.skillAuthor ?? "";
     const tags = (card.dataset.skillTags ?? "")
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
     dialogTitle.textContent = skillName;
+    if (dialogAuthor) {
+      dialogAuthor.textContent = author;
+      dialogAuthor.hidden = author.length === 0;
+    }
     dialogDescription.textContent = card.dataset.skillDescription || "No description provided.";
     if (dialogTags) {
       dialogTags.replaceChildren(
@@ -252,7 +259,15 @@
     overflow-wrap: anywhere;
   }
 
-  .skill-dialog p {
+  .dialog-author {
+    margin: 0.5rem 0 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .skill-dialog p:not(.dialog-author) {
     margin: 1rem 0 0;
     color: var(--muted);
     font-size: 1rem;

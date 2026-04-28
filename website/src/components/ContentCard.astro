@@ -22,6 +22,7 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
   tabindex={dialogEnabled ? "0" : undefined}
   data-skill-card={dialogEnabled ? true : undefined}
   data-skill-name={dialogEnabled ? item.name : undefined}
+  data-skill-author={dialogEnabled ? item.author : undefined}
   data-skill-description={dialogEnabled ? item.description : undefined}
   data-skill-tags={dialogEnabled ? item.tags.join(", ") : undefined}
   data-search-item
