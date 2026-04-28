@@ -4,12 +4,13 @@ import SearchViewControls from "../components/SearchViewControls.astro";
 import ContentCard from "../components/ContentCard.astro";
 import SkillDialog from "../components/SkillDialog.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { getDeclaredTags, getSkills, getSubagents } from "../lib/repoContent.mjs";
+import { getContentUpdates, getDeclaredTags, getSkills, getSubagents, sortByRecentUpdate } from "../lib/repoContent.mjs";
 
 const baseUrl = import.meta.env.BASE_URL;
 const tags = getDeclaredTags();
-const skills = getSkills();
-const subagents = getSubagents();
+const contentUpdates = getContentUpdates();
+const skills = sortByRecentUpdate(getSkills(), "skills", contentUpdates);
+const subagents = sortByRecentUpdate(getSubagents(), "subagents", contentUpdates);
 ---
 
 <SiteLayout>
@@ -20,7 +21,7 @@ const subagents = getSubagents();
 
     <section class="skills-section" data-search-section aria-labelledby="home-skills-title">
       <div class="section-header">
-        <h2 id="home-skills-title">Skills</h2>
+        <h2 id="home-skills-title">Latest Skills</h2>
         <a class="view-all" href={`${baseUrl}skills/`}>View All</a>
       </div>
 
@@ -31,7 +32,7 @@ const subagents = getSubagents();
 
     <section class="content-section" data-search-section aria-labelledby="home-subagents-title">
       <div class="section-header">
-        <h2 id="home-subagents-title">Subagents</h2>
+        <h2 id="home-subagents-title">Latest Subagents</h2>
         <a class="view-all" href={`${baseUrl}subagents/`}>View All</a>
       </div>
 

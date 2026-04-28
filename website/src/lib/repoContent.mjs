@@ -18,6 +18,7 @@ function findRepoRoot(startDir) {
 
 const repoRoot = findRepoRoot(process.cwd());
 const tagsPath = path.join(repoRoot, "tags.yml");
+const contentUpdatesPath = path.join(repoRoot, "website", "content-updates.yml");
 
 function normalizeTag(tag) {
   return tag.trim().toLowerCase();
@@ -55,6 +56,111 @@ export function getDeclaredTags() {
   }
 
   return [...new Set(tags.filter((tag) => typeof tag === "string").map((tag) => tag.trim()).filter(Boolean))];
+}
+
+function normalizeContentDate(value) {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString();
+  }
+
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? null : new Date(timestamp).toISOString();
+}
+
+function getContentDateTimestamp(value) {
+  const normalizedDate = normalizeContentDate(value);
+  return normalizedDate ? Date.parse(normalizedDate) : null;
+}
+
+function normalizeAuthor(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const author = value.trim();
+  return /^[A-Za-z]{3}\d{3}$/.test(author) ? author : "";
+}
+
+function normalizeContentUpdateEntry(entry) {
+  if (entry instanceof Date || typeof entry === "string") {
+    return {
+      createdAt: normalizeContentDate(entry),
+      author: "",
+    };
+  }
+
+  if (!entry || typeof entry !== "object") {
+    return {
+      createdAt: null,
+      author: "",
+    };
+  }
+
+  return {
+    createdAt: normalizeContentDate(entry.createdAt),
+    author: normalizeAuthor(entry.author),
+  };
+}
+
+function normalizeContentUpdates(updates) {
+  return Object.fromEntries(
+    Object.entries(updates).map(([collectionName, collectionUpdates]) => {
+      if (!collectionUpdates || typeof collectionUpdates !== "object") {
+        return [collectionName, {}];
+      }
+
+      return [
+        collectionName,
+        Object.fromEntries(
+          Object.entries(collectionUpdates).map(([itemName, entry]) => [itemName, normalizeContentUpdateEntry(entry)]),
+        ),
+      ];
+    }),
+  );
+}
+
+export function getContentUpdates() {
+  if (!fs.existsSync(contentUpdatesPath)) {
+    return {};
+  }
+
+  const updates = yaml.load(fs.readFileSync(contentUpdatesPath, "utf-8"));
+
+  if (!updates || typeof updates !== "object") {
+    return {};
+  }
+
+  return normalizeContentUpdates(updates);
+}
+
+export function sortByRecentUpdate(items, collectionName, updates = getContentUpdates()) {
+  const collectionUpdates =
+    updates && typeof updates === "object" && updates[collectionName] && typeof updates[collectionName] === "object"
+      ? updates[collectionName]
+      : {};
+
+  return [...items].sort((a, b) => {
+    const aCreatedAt = getContentDateTimestamp(collectionUpdates[a.name]?.createdAt);
+    const bCreatedAt = getContentDateTimestamp(collectionUpdates[b.name]?.createdAt);
+
+    if (aCreatedAt !== null && bCreatedAt !== null && aCreatedAt !== bCreatedAt) {
+      return bCreatedAt - aCreatedAt;
+    }
+
+    if (aCreatedAt !== null && bCreatedAt === null) {
+      return -1;
+    }
+
+    if (aCreatedAt === null && bCreatedAt !== null) {
+      return 1;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
 }
 
 export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags()) {

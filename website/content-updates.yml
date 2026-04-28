@@ -1,0 +1,82 @@
+# Metadata for root-level content.
+# Git hooks can update this file when skill folders or subagent files change.
+skills:
+  accessibility-audit:
+    createdAt: "2026-04-20T09:12:00-04:00"
+    author: "Ava104"
+  api-design:
+    createdAt: "2026-04-19T11:34:00-04:00"
+    author: "Ben215"
+  api-testing:
+    createdAt: "2026-04-20T13:08:00-04:00"
+    author: "Cal326"
+  caching-strategy:
+    createdAt: "2026-04-18T16:42:00-04:00"
+    author: "Dee437"
+  code-documentation:
+    createdAt: "2026-04-21T10:25:00-04:00"
+    author: "Eli548"
+  code-review-helper:
+    createdAt: "2026-04-19T14:51:00-04:00"
+    author: "Fay659"
+  data-validation:
+    createdAt: "2026-04-20T15:17:00-04:00"
+    author: "Gia760"
+  database-optimization:
+    createdAt: "2026-04-18T12:03:00-04:00"
+    author: "Hal871"
+  debugging-guide:
+    createdAt: "2026-04-21T09:44:00-04:00"
+    author: "Ian982"
+  dependency-analyzer:
+    createdAt: "2026-04-20T11:29:00-04:00"
+    author: "Jan093"
+  error-handling:
+    createdAt: "2026-04-19T17:02:00-04:00"
+    author: "Kai184"
+  error-recovery:
+    createdAt: "2026-04-20T08:55:00-04:00"
+    author: "Lea295"
+  explain-code:
+    createdAt: "2026-04-17T10:10:00-04:00"
+    author: "Max306"
+  log-analyzer:
+    createdAt: "2026-04-18T14:39:00-04:00"
+    author: "Nia417"
+  markdown-formatter:
+    createdAt: "2026-04-21T16:26:00-04:00"
+    author: "Oli528"
+  monitoring-setup:
+    createdAt: "2026-04-19T09:31:00-04:00"
+    author: "Pia639"
+  performance-profiler:
+    createdAt: "2026-04-20T14:12:00-04:00"
+    author: "Qin740"
+  refactoring-assistant:
+    createdAt: "2026-04-18T11:47:00-04:00"
+    author: "Ray851"
+  security-checker:
+    createdAt: "2026-04-19T13:23:00-04:00"
+    author: "Sky962"
+  swift-concurrency-refactor:
+    createdAt: "2026-04-17T15:19:00-04:00"
+    author: "Tia073"
+  swift-gcd-refactor:
+    createdAt: "2026-04-17T15:42:00-04:00"
+    author: "Uma184"
+  swift-remove-debug-prints:
+    createdAt: "2026-04-17T16:08:00-04:00"
+    author: "Vic295"
+  testing-helper:
+    createdAt: "2026-04-20T12:36:00-04:00"
+    author: "Wes306"
+  ui-component-builder:
+    createdAt: "2026-04-27T13:54:00-04:00"
+    author: "Xia417"
+subagents:
+  code-improvement-suggester.md:
+    createdAt: "2026-04-18T10:06:00-04:00"
+    author: "Yas528"
+  swiftdata-persistence-engineer.md:
+    createdAt: "2026-04-17T14:28:00-04:00"
+    author: "Zed639"
