@@ -4,7 +4,6 @@ const baseUrl = import.meta.env.BASE_URL.endsWith("/")
   : `${import.meta.env.BASE_URL}/`;
 
 const navItems = [
-  { label: "Project Forge", href: "/project-forge/" },
   { label: "Home", href: "/" },
   { label: "Skills", href: "/skills/" },
   { label: "Subagents", href: "/subagents/" },
@@ -108,7 +107,7 @@ function isActive(href: string) {
     }
 
     ul {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     a {
