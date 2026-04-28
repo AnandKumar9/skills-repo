@@ -6,7 +6,10 @@ function findRepoRoot(startDir) {
   let currentDir = startDir;
 
   while (currentDir !== path.dirname(currentDir)) {
-    if (fs.existsSync(path.join(currentDir, "tags.yml")) && fs.existsSync(path.join(currentDir, "website"))) {
+    if (
+      fs.existsSync(path.join(currentDir, "website")) &&
+      fs.existsSync(path.join(currentDir, "website", "content-tags.yml"))
+    ) {
       return currentDir;
     }
 
@@ -17,7 +20,7 @@ function findRepoRoot(startDir) {
 }
 
 const repoRoot = findRepoRoot(process.cwd());
-const tagsPath = path.join(repoRoot, "tags.yml");
+const tagsPath = path.join(repoRoot, "website", "content-tags.yml");
 const contentUpdatesPath = path.join(repoRoot, "website", "content-updates.yml");
 
 function normalizeTag(tag) {
