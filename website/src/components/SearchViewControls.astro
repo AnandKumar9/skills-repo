@@ -3,6 +3,7 @@ interface Props {
   resultLabelPlural?: string;
   resultLabelSingular?: string;
   searchPlaceholder?: string;
+  showSearch?: boolean;
   showViewToggle?: boolean;
   tags?: string[];
 }
@@ -11,67 +12,72 @@ const {
   resultLabelPlural = "items",
   resultLabelSingular = "item",
   searchPlaceholder = "Search",
+  showSearch = true,
   showViewToggle = true,
   tags = [],
 } = Astro.props;
 ---
 
-<div class="search-view-stack">
-  <div
-    class="search-view-controls"
-    data-search-view-controls
-    data-result-label-singular={resultLabelSingular}
-    data-result-label-plural={resultLabelPlural}
-    aria-label="Search and view controls"
-  >
-    <label class="search-field">
-      <span class="sr-only">Search</span>
-      <input type="search" placeholder={searchPlaceholder} data-search-input />
-    </label>
+<div
+  class="search-view-stack"
+  data-search-view-controls
+  data-result-label-singular={resultLabelSingular}
+  data-result-label-plural={resultLabelPlural}
+  aria-label="Search and view controls"
+>
+  {
+    (showSearch || showViewToggle) && (
+      <div class="search-view-controls">
+        {showSearch && (
+          <label class="search-field">
+            <span class="sr-only">Search</span>
+            <input type="search" placeholder={searchPlaceholder} data-search-input />
+          </label>
+        )}
 
-    {
-      showViewToggle && (
-        <div class="view-toggle" aria-label="View mode">
-          <button
-            class="view-toggle-button is-active"
-            type="button"
-            data-view-mode-button="grid"
-            aria-pressed="true"
-            aria-label="Grid view"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
-              />
-            </svg>
-          </button>
-          <button
-            class="view-toggle-button"
-            type="button"
-            data-view-mode-button="list"
-            aria-pressed="false"
-            aria-label="List view"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
-              />
-            </svg>
-          </button>
-        </div>
-      )
-    }
-  </div>
+        {showViewToggle && (
+          <div class="view-toggle" aria-label="View mode">
+            <button
+              class="view-toggle-button is-active"
+              type="button"
+              data-view-mode-button="grid"
+              aria-pressed="true"
+              aria-label="Grid view"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
+                />
+              </svg>
+            </button>
+            <button
+              class="view-toggle-button"
+              type="button"
+              data-view-mode-button="list"
+              aria-pressed="false"
+              aria-label="List view"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   {
     tags.length > 0 && (
@@ -99,7 +105,7 @@ const {
     const searchStatus = page?.querySelector<HTMLElement>("[data-search-status]");
     const emptyState = page?.querySelector<HTMLElement>("[data-search-empty]");
     const buttons = controls.querySelectorAll<HTMLButtonElement>("[data-view-mode-button]");
-    const tagButtons = controls.parentElement?.querySelectorAll<HTMLButtonElement>("[data-tag-filter]");
+    const tagButtons = controls.querySelectorAll<HTMLButtonElement>("[data-tag-filter]");
     const activeTags = new Set<string>();
 
     function isViewMode(mode: string): mode is "grid" | "list" {
@@ -145,33 +151,35 @@ const {
 
     function formatSearchStatus(count: number, query: string) {
       const tagList = Array.from(activeTags);
+      const rawQuery = searchInput?.value.trim() ?? "";
 
       if (query.length === 0 && tagList.length === 0) {
         return `${formatResultCount(count)} shown`;
       }
 
       if (query.length > 0 && tagList.length > 0) {
-        return `${formatResultCount(count)} found for "${searchInput?.value.trim()}" in ${tagList.join(", ")}`;
+        return `${formatResultCount(count)} found for "${rawQuery}" in ${tagList.join(", ")}`;
       }
 
       if (query.length > 0) {
-        return `${formatResultCount(count)} found for "${searchInput?.value.trim()}"`;
+        return `${formatResultCount(count)} found for "${rawQuery}"`;
       }
 
       return `${formatResultCount(count)} found in ${tagList.join(", ")}`;
     }
 
     function updateSearchResults() {
-      if (!searchInput || !searchItems) return;
+      if (!searchItems) return;
 
-      const query = searchInput.value.trim().toLowerCase();
+      const query = searchInput?.value.trim().toLowerCase() ?? "";
       const currentView = viewContainer?.dataset.viewMode ?? "grid";
       let visibleCount = 0;
 
       searchItems.forEach((item) => {
         const itemTags = getItemTags(item);
         const matchesQuery = query.length === 0 || getSearchText(item).includes(query);
-        const matchesTags = activeTags.size === 0 || Array.from(activeTags).some((tag) => itemTags.includes(tag));
+        const matchesTags =
+          activeTags.size === 0 || Array.from(activeTags).some((tag) => itemTags.includes(tag.toLowerCase()));
         const isVisible = matchesQuery && matchesTags;
         item.hidden = !isVisible;
 
@@ -219,16 +227,18 @@ const {
 
     tagButtons?.forEach((button) => {
       button.addEventListener("click", () => {
-        const tag = button.dataset.tagFilter?.toLowerCase();
+        const tag = button.dataset.tagFilter;
         if (!tag) return;
 
-        if (activeTags.has(tag)) {
-          activeTags.delete(tag);
+        const activeTag = Array.from(activeTags).find((selectedTag) => selectedTag.toLowerCase() === tag.toLowerCase());
+
+        if (activeTag) {
+          activeTags.delete(activeTag);
         } else {
           activeTags.add(tag);
         }
 
-        const isActive = activeTags.has(tag);
+        const isActive = !activeTag;
         button.classList.toggle("is-active", isActive);
         button.setAttribute("aria-pressed", String(isActive));
         updateSearchResults();

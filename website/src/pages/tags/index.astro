@@ -1,9 +1,15 @@
 ---
+import ContentCard from "../../components/ContentCard.astro";
 import PageHeading from "../../components/PageHeading.astro";
+import SearchViewControls from "../../components/SearchViewControls.astro";
+import SkillDialog from "../../components/SkillDialog.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
-import { getDeclaredTags } from "../../lib/repoContent.mjs";
+import { getDeclaredTags, getSkills, getSubagents } from "../../lib/repoContent.mjs";
 
+const baseUrl = import.meta.env.BASE_URL;
 const tags = getDeclaredTags();
+const skills = getSkills();
+const subagents = getSubagents();
 ---
 
 <SiteLayout>
@@ -12,11 +18,43 @@ const tags = getDeclaredTags();
 
     {
       tags.length > 0 ? (
-        <ul class="tag-grid" aria-label="Tags">
-          {tags.map((tag) => (
-            <li>{tag}</li>
-          ))}
-        </ul>
+        <>
+          <SearchViewControls
+            showSearch={false}
+            showViewToggle={false}
+            resultLabelSingular="item"
+            resultLabelPlural="items"
+            tags={tags}
+          />
+
+          <p class="search-status" data-search-status aria-live="polite"></p>
+
+          <section class="skills-section" aria-labelledby="tags-skills-title">
+            <div class="section-header">
+              <h2 id="tags-skills-title">Skills</h2>
+              <a class="view-all" href={`${baseUrl}skills/`}>View All</a>
+            </div>
+
+            <div class="grid" data-view-mode="grid">
+              {skills.map((skill) => <ContentCard item={skill} dialogEnabled />)}
+            </div>
+          </section>
+
+          <section class="content-section" aria-labelledby="tags-subagents-title">
+            <div class="section-header">
+              <h2 id="tags-subagents-title">Subagents</h2>
+              <a class="view-all" href={`${baseUrl}subagents/`}>View All</a>
+            </div>
+
+            <div class="grid" data-view-mode="grid">
+              {subagents.map((subagent) => <ContentCard item={subagent} dialogEnabled />)}
+            </div>
+          </section>
+
+          <p class="empty-state" data-search-empty hidden>No items match those tags.</p>
+
+          <SkillDialog />
+        </>
       ) : (
         <p class="empty-state">No tags are declared yet.</p>
       )
@@ -26,28 +64,72 @@ const tags = getDeclaredTags();
 
 <style>
   .page {
-    max-width: 960px;
+    max-width: 1000px;
     margin: 0 auto;
   }
 
-  .tag-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  .skills-section,
+  .content-section {
+    margin-bottom: 1.5rem;
   }
 
-  .tag-grid li {
-    padding: 0.5rem 0.75rem;
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-header h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+
+  .view-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: 8px;
     color: var(--text);
     background: var(--surface);
-    box-shadow: var(--card-shadow);
     font-size: 0.875rem;
-    line-height: 1.2;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .view-all:hover,
+  .view-all:focus-visible {
+    border-color: var(--border-hover);
+    color: var(--accent-hover);
+    box-shadow: var(--card-shadow);
+  }
+
+  .view-all:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 315px);
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .search-status {
+    min-height: 1.25rem;
+    margin: -20px 0 16px;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
   }
 
   .empty-state {
@@ -57,5 +139,12 @@ const tags = getDeclaredTags();
     border-radius: 8px;
     color: var(--muted);
     background: var(--surface);
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+      justify-content: stretch;
+    }
   }
 </style>
