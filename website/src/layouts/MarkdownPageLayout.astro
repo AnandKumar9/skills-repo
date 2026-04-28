@@ -1,0 +1,134 @@
+---
+import PageHeading from "../components/PageHeading.astro";
+import SiteLayout from "./SiteLayout.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<SiteLayout>
+  <main class="markdown-page">
+    <PageHeading pageTitle={frontmatter.title} pageDescription={frontmatter.description} />
+    <article class="prose">
+      <slot />
+    </article>
+  </main>
+</SiteLayout>
+
+<style>
+  .markdown-page {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .prose {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .prose :global(*) {
+    box-sizing: border-box;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3) {
+    margin: 2rem 0 0.75rem;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  .prose :global(h2) {
+    font-size: 1.5rem;
+  }
+
+  .prose :global(h3) {
+    font-size: 1.125rem;
+  }
+
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol),
+  .prose :global(blockquote),
+  .prose :global(pre),
+  .prose :global(table) {
+    margin: 0 0 1rem;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.5rem;
+  }
+
+  .prose :global(li + li) {
+    margin-top: 0.375rem;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+  }
+
+  .prose :global(a:hover),
+  .prose :global(a:focus-visible) {
+    color: var(--accent-hover);
+  }
+
+  .prose :global(blockquote) {
+    padding: 0.875rem 1rem;
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    background: var(--surface);
+    color: var(--muted);
+  }
+
+  .prose :global(code) {
+    padding: 0.125rem 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9em;
+  }
+
+  .prose :global(pre) {
+    overflow-x: auto;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+
+  .prose :global(pre code) {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .prose :global(th),
+  .prose :global(td) {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .prose :global(th) {
+    background: var(--heading-bg);
+  }
+
+  .prose :global(tr:last-child td) {
+    border-bottom: 0;
+  }
+</style>

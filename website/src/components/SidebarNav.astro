@@ -8,6 +8,7 @@ const navItems = [
   { label: "Skills", href: "/skills/" },
   { label: "Subagents", href: "/subagents/" },
   { label: "AI Field Guide", href: "/ai-field-guide/" },
+  { label: "Contribute", href: "/contribute/" },
   { label: "Tags", href: "/tags/" },
 ];
 
@@ -108,7 +109,7 @@ function isActive(href: string) {
     }
 
     ul {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     }
 
     a {
