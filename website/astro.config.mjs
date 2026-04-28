@@ -10,7 +10,11 @@ export default defineConfig({
 	base,
 	integrations: [
 		starlight({
-			title: 'AI Field Guide',
+			title: 'DCI AI Hub',
+			components: {
+				ThemeProvider: './src/components/starlight/ThemeProvider.astro',
+				ThemeSelect: './src/components/starlight/ThemeSelect.astro',
+			},
 			sidebar: [
 				{
 					label: 'AI Field Guide',

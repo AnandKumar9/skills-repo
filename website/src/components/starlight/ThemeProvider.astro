@@ -1,0 +1,24 @@
+{/* This mirrors Starlight's provider, but uses the main site's theme-preference key. */}
+<script is:inline>
+  window.StarlightThemeProvider = (() => {
+    const storageKey = "theme-preference";
+    const storedTheme =
+      typeof localStorage !== "undefined" && localStorage.getItem(storageKey);
+    const theme =
+      storedTheme === "light" || storedTheme === "dark"
+        ? storedTheme
+        : window.matchMedia("(prefers-color-scheme: light)").matches
+          ? "light"
+          : "dark";
+
+    document.documentElement.dataset.theme = theme;
+
+    return {
+      updatePickers(theme = storedTheme === "light" || storedTheme === "dark" ? storedTheme : "auto") {
+        document.querySelectorAll("[data-dci-starlight-theme-toggle]").forEach((button) => {
+          button.dataset.mode = theme;
+        });
+      },
+    };
+  })();
+</script>
