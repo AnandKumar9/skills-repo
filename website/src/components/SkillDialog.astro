@@ -84,6 +84,7 @@
   const dialogTags = document.querySelector<HTMLElement>("[data-dialog-tags]");
   const closeButton = document.querySelector<HTMLButtonElement>("[data-skill-dialog-close]");
   const installCloseButton = document.querySelector<HTMLButtonElement>("[data-install-dialog-close]");
+  const installDialogTitle = document.querySelector<HTMLElement>("#install-dialog-title");
   const installCommand = document.querySelector<HTMLElement>("[data-install-command]");
   const copyInstallCommand = document.querySelector<HTMLButtonElement>("[data-copy-install-command]");
   const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
@@ -92,12 +93,13 @@
     if (!dialog || !dialogTitle || !dialogDescription) return;
 
     const skillName = card.dataset.skillName ?? "";
+    const skillTitle = card.dataset.skillTitle ?? skillName;
     const author = card.dataset.skillAuthor ?? "";
     const tags = (card.dataset.skillTags ?? "")
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
-    dialogTitle.textContent = skillName;
+    dialogTitle.textContent = skillTitle;
     if (dialogAuthor) {
       dialogAuthor.textContent = author;
       dialogAuthor.hidden = author.length === 0;
@@ -120,7 +122,10 @@
     if (!installDialog || !installCommand) return;
 
     const skillName = card.dataset.skillName ?? "";
-    const command = `npx skills add ${skillName}`;
+    const command = card.dataset.downloadCommand || `npx skills add ${skillName}`;
+    if (installDialogTitle) {
+      installDialogTitle.textContent = card.dataset.downloadDialogTitle || "Install";
+    }
     installCommand.textContent = command;
     if (copyStatus) copyStatus.textContent = "";
     installDialog.showModal();
@@ -418,5 +423,6 @@
     color: var(--muted);
     font-size: 1rem;
     line-height: 1.6;
+    white-space: pre-line;
   }
 </style>

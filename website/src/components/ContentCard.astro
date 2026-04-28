@@ -2,17 +2,26 @@
 interface ContentItem {
   name: string;
   description: string;
+  dialogDescription?: string;
+  downloadCommand?: string;
+  downloadDialogTitle?: string;
   tags: string[];
   author?: string;
+  downloadUrl?: string;
+  githubUrl?: string;
 }
 
 interface Props {
   defaultHidden?: boolean;
   item: ContentItem;
   dialogEnabled?: boolean;
+  variant?: "default" | "compact";
 }
 
-const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
+const { defaultHidden = false, item, dialogEnabled = false, variant = "default" } = Astro.props;
+const title = variant === "compact" ? item.description || item.name : item.name;
+const githubUrl = item.githubUrl ?? "https://github.com";
+const downloadUrl = item.downloadUrl ?? "#";
 ---
 
 <article
@@ -21,10 +30,14 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
   role={dialogEnabled ? "button" : undefined}
   tabindex={dialogEnabled ? "0" : undefined}
   data-skill-card={dialogEnabled ? true : undefined}
+  data-skill-title={dialogEnabled ? title : undefined}
   data-skill-name={dialogEnabled ? item.name : undefined}
   data-skill-author={dialogEnabled ? item.author : undefined}
-  data-skill-description={dialogEnabled ? item.description : undefined}
+  data-skill-description={dialogEnabled ? item.dialogDescription ?? item.description : undefined}
   data-skill-tags={dialogEnabled ? item.tags.join(", ") : undefined}
+  data-download-command={dialogEnabled ? item.downloadCommand : undefined}
+  data-download-dialog-title={dialogEnabled ? item.downloadDialogTitle : undefined}
+  data-card-variant={variant}
   data-search-item
   data-search-default-hidden={defaultHidden ? "true" : undefined}
   data-search-name={item.name}
@@ -33,9 +46,9 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
   aria-label={dialogEnabled ? `View details for ${item.name}` : undefined}
 >
   <div class="card-content">
-    <h2>{item.name}</h2>
+    <h2>{title}</h2>
     {item.author && <p class="author-code" title={`Author ${item.author}`}>{item.author}</p>}
-    {item.description && <p>{item.description}</p>}
+    {variant === "default" && item.description && <p>{item.description}</p>}
   </div>
   <footer class="card-footer">
     <div class="footer-tags">
@@ -52,10 +65,10 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
     <div class="footer-actions">
       <a
         class="footer-icon-link"
-        href="https://github.com"
+        href={githubUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Open GitHub"
+        aria-label={`Open ${item.name} on GitHub`}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
@@ -64,7 +77,13 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
           />
         </svg>
       </a>
-      <a class="footer-icon-link" href="#" data-skill-download aria-label={`Download ${item.name}`}>
+      <a
+        class="footer-icon-link"
+        href={downloadUrl}
+        data-skill-download
+        download={item.downloadUrl ? item.name : undefined}
+        aria-label={`Download ${item.name}`}
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="none"
@@ -118,6 +137,10 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
     border-bottom: 1px solid var(--border);
     background: transparent;
     box-shadow: none;
+  }
+
+  .card[data-card-variant="compact"] {
+    height: 112px;
   }
 
   .card:hover,
@@ -196,6 +219,29 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
+  }
+
+  .card[data-card-variant="compact"] .card-content {
+    padding: 0.875rem 1rem 0.5rem;
+  }
+
+  .card[data-card-variant="compact"] h2 {
+    display: -webkit-box;
+    margin-bottom: 0.625rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  :global(.grid[data-view-mode="list"]) .card[data-card-variant="compact"] .card-content {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+  }
+
+  :global(.grid[data-view-mode="list"]) .card[data-card-variant="compact"] h2 {
+    display: block;
+    -webkit-line-clamp: unset;
   }
 
   :global(.grid[data-view-mode="list"]) .card-content > p:not(.author-code) {

@@ -1,0 +1,83 @@
+---
+import ContentCard from "../../components/ContentCard.astro";
+import PageHeading from "../../components/PageHeading.astro";
+import SearchViewControls from "../../components/SearchViewControls.astro";
+import SkillDialog from "../../components/SkillDialog.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { getDeclaredTags, getRules } from "../../lib/repoContent.mjs";
+
+const tags = getDeclaredTags();
+const rules = getRules();
+---
+
+<SiteLayout>
+  <main class="page">
+    <PageHeading pageTitle="Rules" pageDescription="Browse all rule markdown files from the repo." />
+
+    <SearchViewControls
+      searchPlaceholder="Search rules"
+      resultLabelSingular="rule"
+      resultLabelPlural="rules"
+      tags={tags}
+    />
+
+    <p class="search-status" data-search-status aria-live="polite"></p>
+
+    <section class="grid" data-view-container data-view-mode="grid">
+      {rules.map((rule) => <ContentCard item={rule} dialogEnabled variant="compact" />)}
+    </section>
+
+    <p class="empty-state" data-search-empty hidden>No rules match that search.</p>
+
+    <SkillDialog />
+  </main>
+</SiteLayout>
+
+<style>
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 315px);
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .search-status {
+    min-height: 1.25rem;
+    margin: -20px 0 16px;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .empty-state {
+    margin: 1rem 0 0;
+    padding: 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+
+  .grid[data-view-mode="list"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+      justify-content: stretch;
+    }
+  }
+</style>

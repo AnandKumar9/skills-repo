@@ -4,12 +4,13 @@ import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
 import SkillDialog from "../../components/SkillDialog.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
-import { getDeclaredTags, getSkills, getSubagents } from "../../lib/repoContent.mjs";
+import { getDeclaredTags, getRules, getSkills, getSubagents } from "../../lib/repoContent.mjs";
 
 const baseUrl = import.meta.env.BASE_URL;
 const tags = getDeclaredTags();
 const skills = getSkills();
 const subagents = getSubagents();
+const rules = getRules();
 ---
 
 <SiteLayout>
@@ -49,6 +50,17 @@ const subagents = getSubagents();
 
             <div class="grid" data-view-mode="grid">
               {subagents.map((subagent) => <ContentCard item={subagent} dialogEnabled />)}
+            </div>
+          </section>
+
+          <section class="content-section" data-search-section aria-labelledby="tags-rules-title">
+            <div class="section-header">
+              <h2 id="tags-rules-title">Rules</h2>
+              <a class="view-all" href={`${baseUrl}rules/`}>View All</a>
+            </div>
+
+            <div class="grid" data-view-mode="grid">
+              {rules.map((rule) => <ContentCard item={rule} dialogEnabled variant="compact" />)}
             </div>
           </section>
 

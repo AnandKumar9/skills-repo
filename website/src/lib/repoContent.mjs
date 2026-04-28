@@ -22,6 +22,11 @@ function findRepoRoot(startDir) {
 const repoRoot = findRepoRoot(process.cwd());
 const tagsPath = path.join(repoRoot, "website", "content-tags.yml");
 const contentUpdatesPath = path.join(repoRoot, "website", "content-updates.yml");
+const repositoryUrl = (process.env.PUBLIC_REPOSITORY_URL ?? "https://github.com/AnandKumar9/skills-repo").replace(
+  /\/$/,
+  "",
+);
+const repositoryRef = process.env.PUBLIC_REPOSITORY_REF ?? "main";
 
 function normalizeTag(tag) {
   return tag.trim().toLowerCase();
@@ -196,6 +201,35 @@ function getContentEntry(collectionName, itemName, updates = getContentUpdates()
   return updates?.[collectionName]?.[itemName] ?? { createdAt: null, author: "" };
 }
 
+function encodeSourcePath(sourcePath) {
+  return sourcePath
+    .split(path.sep)
+    .join("/")
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
+function getSourceUrls(sourcePath) {
+  const encodedPath = encodeSourcePath(sourcePath);
+  const githubUrl = `${repositoryUrl}/blob/${repositoryRef}/${encodedPath}`;
+  const downloadUrl = repositoryUrl.includes("github.com")
+    ? `${repositoryUrl.replace("github.com", "raw.githubusercontent.com")}/${repositoryRef}/${encodedPath}`
+    : githubUrl;
+
+  return {
+    downloadUrl,
+    githubUrl,
+  };
+}
+
+function getMarkdownBodyExcerpt(markdownPath, lineCount = 10) {
+  const markdown = fs.readFileSync(markdownPath, "utf-8");
+  const body = markdown.replace(/^---\s*\n[\s\S]*?\n---\s*/, "");
+
+  return body.split(/\r?\n/).slice(0, lineCount).join("\n").trim();
+}
+
 export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags()) {
   const markdown = fs.readFileSync(markdownPath, "utf-8");
   const frontmatter = markdown.match(/^---\s*\n([\s\S]*?)\n---/);
@@ -275,6 +309,39 @@ export function getSubagents() {
         description: metadata.description,
         tags: metadata.tags,
         author: metadata.author || contentEntry.author,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export function getRules() {
+  const rulesDir = getRepoPath("rules");
+  const declaredTags = getDeclaredTags();
+  const updates = getContentUpdates();
+
+  if (!fs.existsSync(rulesDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(rulesDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+    .map((entry) => {
+      const sourcePath = path.join("rules", entry.name);
+      const rulePath = path.join(rulesDir, entry.name);
+      const metadata = getMarkdownMetadata(rulePath, declaredTags);
+      const contentEntry = getContentEntry("rules", entry.name, updates);
+      const sourceUrls = getSourceUrls(sourcePath);
+
+      return {
+        name: entry.name,
+        description: metadata.description,
+        dialogDescription: getMarkdownBodyExcerpt(rulePath),
+        downloadCommand: `curl -L ${sourceUrls.downloadUrl} -o ${entry.name}`,
+        downloadDialogTitle: "Download",
+        tags: metadata.tags,
+        author: metadata.author || contentEntry.author,
+        ...sourceUrls,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

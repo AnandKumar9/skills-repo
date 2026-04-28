@@ -4,13 +4,21 @@ import SearchViewControls from "../components/SearchViewControls.astro";
 import ContentCard from "../components/ContentCard.astro";
 import SkillDialog from "../components/SkillDialog.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { getContentUpdates, getDeclaredTags, getSkills, getSubagents, sortByRecentUpdate } from "../lib/repoContent.mjs";
+import {
+  getContentUpdates,
+  getDeclaredTags,
+  getRules,
+  getSkills,
+  getSubagents,
+  sortByRecentUpdate,
+} from "../lib/repoContent.mjs";
 
 const baseUrl = import.meta.env.BASE_URL;
 const tags = getDeclaredTags();
 const contentUpdates = getContentUpdates();
 const skills = sortByRecentUpdate(getSkills(), "skills", contentUpdates);
 const subagents = sortByRecentUpdate(getSubagents(), "subagents", contentUpdates);
+const rules = sortByRecentUpdate(getRules(), "rules", contentUpdates);
 ---
 
 <SiteLayout>
@@ -38,6 +46,19 @@ const subagents = sortByRecentUpdate(getSubagents(), "subagents", contentUpdates
 
       <div class="grid" data-view-mode="grid">
         {subagents.map((subagent, index) => <ContentCard item={subagent} defaultHidden={index >= 6} dialogEnabled />)}
+      </div>
+    </section>
+
+    <section class="content-section" data-search-section aria-labelledby="home-rules-title">
+      <div class="section-header">
+        <h2 id="home-rules-title">Latest Rules</h2>
+        <a class="view-all" href={`${baseUrl}rules/`}>View All</a>
+      </div>
+
+      <div class="grid" data-view-mode="grid">
+        {rules.map((rule, index) => (
+          <ContentCard item={rule} defaultHidden={index >= 6} dialogEnabled variant="compact" />
+        ))}
       </div>
     </section>
 
