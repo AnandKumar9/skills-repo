@@ -11,6 +11,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'DCI AI Hub',
+			customCss: ['./src/styles/theme.css'],
 			components: {
 				ThemeProvider: './src/components/starlight/ThemeProvider.astro',
 				ThemeSelect: './src/components/starlight/ThemeSelect.astro',
