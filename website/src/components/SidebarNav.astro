@@ -7,7 +7,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Skills", href: "/skills/" },
   { label: "Subagents", href: "/subagents/" },
-  { label: "AI Field Guide", href: "/ai-field-guide/" },
+  { label: "AI Field Guide", href: "/ai-field-guide/", target: "_blank", rel: "noopener noreferrer" },
   { label: "Useful Resources", href: "/useful-resources/" },
   { label: "Contribute", href: "/contribute/" },
   { label: "Tags", href: "/tags/" },
@@ -40,7 +40,12 @@ function isActive(href: string) {
       {
         navItems.map((item) => (
           <li>
-            <a href={withBase(item.href)} aria-current={isActive(item.href) ? "page" : undefined}>
+            <a
+              href={withBase(item.href)}
+              target={item.target}
+              rel={item.rel}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
               {item.label}
             </a>
           </li>
