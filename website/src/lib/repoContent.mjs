@@ -163,6 +163,10 @@ export function sortByRecentUpdate(items, collectionName, updates = getContentUp
   });
 }
 
+function getContentEntry(collectionName, itemName, updates = getContentUpdates()) {
+  return updates?.[collectionName]?.[itemName] ?? { createdAt: null, author: "" };
+}
+
 export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags()) {
   const markdown = fs.readFileSync(markdownPath, "utf-8");
   const frontmatter = markdown.match(/^---\s*\n([\s\S]*?)\n---/);
@@ -192,6 +196,7 @@ export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags
 export function getSkills() {
   const skillsDir = getRepoPath("skills");
   const declaredTags = getDeclaredTags();
+  const updates = getContentUpdates();
 
   return fs
     .readdirSync(skillsDir, { withFileTypes: true })
@@ -206,6 +211,7 @@ export function getSkills() {
         name: entry.name,
         description: metadata.description,
         tags: metadata.tags,
+        author: getContentEntry("skills", entry.name, updates).author,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -214,6 +220,7 @@ export function getSkills() {
 export function getSubagents() {
   const subagentsDir = getRepoPath("subagents");
   const declaredTags = getDeclaredTags();
+  const updates = getContentUpdates();
 
   return fs
     .readdirSync(subagentsDir, { withFileTypes: true })
@@ -233,6 +240,7 @@ export function getSubagents() {
         name: entry.name,
         description: metadata.description,
         tags: metadata.tags,
+        author: getContentEntry("subagents", entry.name, updates).author,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

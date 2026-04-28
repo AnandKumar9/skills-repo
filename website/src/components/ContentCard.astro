@@ -3,6 +3,7 @@ interface ContentItem {
   name: string;
   description: string;
   tags: string[];
+  author?: string;
 }
 
 interface Props {
@@ -32,6 +33,7 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
 >
   <div class="card-content">
     <h2>{item.name}</h2>
+    {item.author && <p class="author-code" title={`Author ${item.author}`}>{item.author}</p>}
     {item.description && <p>{item.description}</p>}
   </div>
   <footer class="card-footer">
@@ -167,7 +169,24 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
     text-overflow: ellipsis;
   }
 
-  .card p {
+  .author-code {
+    display: block;
+    max-width: 100%;
+    margin: -0.25rem 0 0.625rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.grid[data-view-mode="list"]) .author-code {
+    display: none;
+  }
+
+  .card-content > p:not(.author-code) {
     display: -webkit-box;
     margin: 0;
     color: var(--muted);
@@ -178,7 +197,7 @@ const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
     overflow: hidden;
   }
 
-  :global(.grid[data-view-mode="list"]) .card p {
+  :global(.grid[data-view-mode="list"]) .card-content > p:not(.author-code) {
     display: block;
     min-width: 0;
     white-space: nowrap;
