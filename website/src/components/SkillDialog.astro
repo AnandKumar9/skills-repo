@@ -1,7 +1,7 @@
 <dialog class="skill-dialog" aria-labelledby="skill-dialog-title">
   <div class="dialog-panel">
     <div class="dialog-content">
-      <button class="dialog-close" type="button" data-dialog-close aria-label="Close">
+      <button class="dialog-close" type="button" data-skill-dialog-close aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="none"
@@ -36,31 +36,57 @@
             />
           </svg>
         </a>
-        <a class="footer-icon-link" href="#" data-dialog-download aria-label="Download item">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
-            />
-          </svg>
-        </a>
       </div>
     </footer>
   </div>
 </dialog>
 
+<dialog class="install-dialog" aria-labelledby="install-dialog-title">
+  <div class="install-panel">
+    <button class="dialog-close" type="button" data-install-dialog-close aria-label="Close">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m6 6 12 12M18 6 6 18"
+        />
+      </svg>
+    </button>
+    <h2 id="install-dialog-title">Install</h2>
+    <div class="install-command-row">
+      <code data-install-command></code>
+      <button class="copy-command" type="button" data-copy-install-command aria-label="Copy install command">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 8V5.2C8 4.08 8 3.52 8.22 3.09a2 2 0 0 1 .87-.87C9.52 2 10.08 2 11.2 2h7.6c1.12 0 1.68 0 2.11.22a2 2 0 0 1 .87.87c.22.43.22.99.22 2.11v7.6c0 1.12 0 1.68-.22 2.11a2 2 0 0 1-.87.87c-.43.22-.99.22-2.11.22H16M5.2 22h7.6c1.12 0 1.68 0 2.11-.22a2 2 0 0 0 .87-.87c.22-.43.22-.99.22-2.11v-7.6c0-1.12 0-1.68-.22-2.11a2 2 0 0 0-.87-.87C14.48 8 13.92 8 12.8 8H5.2c-1.12 0-1.68 0-2.11.22a2 2 0 0 0-.87.87C2 9.52 2 10.08 2 11.2v7.6c0 1.12 0 1.68.22 2.11a2 2 0 0 0 .87.87c.43.22.99.22 2.11.22Z"
+          />
+        </svg>
+      </button>
+    </div>
+    <p class="copy-status" data-copy-status aria-live="polite"></p>
+  </div>
+</dialog>
+
 <script>
   const dialog = document.querySelector<HTMLDialogElement>(".skill-dialog");
+  const installDialog = document.querySelector<HTMLDialogElement>(".install-dialog");
   const dialogTitle = document.querySelector<HTMLElement>("#skill-dialog-title");
   const dialogAuthor = document.querySelector<HTMLElement>("#skill-dialog-author");
   const dialogDescription = document.querySelector<HTMLElement>("#skill-dialog-description");
   const dialogTags = document.querySelector<HTMLElement>("[data-dialog-tags]");
-  const closeButton = document.querySelector<HTMLButtonElement>("[data-dialog-close]");
-  const dialogDownload = document.querySelector<HTMLAnchorElement>("[data-dialog-download]");
+  const closeButton = document.querySelector<HTMLButtonElement>("[data-skill-dialog-close]");
+  const installCloseButton = document.querySelector<HTMLButtonElement>("[data-install-dialog-close]");
+  const installCommand = document.querySelector<HTMLElement>("[data-install-command]");
+  const copyInstallCommand = document.querySelector<HTMLButtonElement>("[data-copy-install-command]");
+  const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
 
   function openSkillDialog(card: HTMLElement) {
     if (!dialog || !dialogTitle || !dialogDescription) return;
@@ -87,8 +113,35 @@
       );
       dialogTags.hidden = tags.length === 0;
     }
-    dialogDownload?.setAttribute("aria-label", `Download ${skillName}`);
     dialog.showModal();
+  }
+
+  function openInstallDialog(card: HTMLElement) {
+    if (!installDialog || !installCommand) return;
+
+    const skillName = card.dataset.skillName ?? "";
+    const command = `npx skills add ${skillName}`;
+    installCommand.textContent = command;
+    if (copyStatus) copyStatus.textContent = "";
+    installDialog.showModal();
+  }
+
+  async function copyCommandToClipboard() {
+    const command = installCommand?.textContent ?? "";
+    if (!command) return;
+
+    try {
+      await navigator.clipboard.writeText(command);
+      if (copyStatus) copyStatus.textContent = "Copied";
+    } catch {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      if (!installCommand) return;
+      range.selectNodeContents(installCommand);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      if (copyStatus) copyStatus.textContent = "Select and copy";
+    }
   }
 
   document.querySelectorAll<HTMLElement>("[data-skill-card]").forEach((card) => {
@@ -106,19 +159,37 @@
     });
   });
 
+  document.querySelectorAll<HTMLElement>("[data-skill-download]").forEach((downloadLink) => {
+    downloadLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      const card = downloadLink.closest<HTMLElement>("[data-skill-card]");
+      if (card) openInstallDialog(card);
+    });
+  });
+
   closeButton?.addEventListener("click", () => dialog?.close());
+  installCloseButton?.addEventListener("click", () => installDialog?.close());
+  copyInstallCommand?.addEventListener("click", () => {
+    void copyCommandToClipboard();
+  });
 
   dialog?.addEventListener("click", (event) => {
     if (event.target === dialog) {
       dialog.close();
     }
   });
+
+  installDialog?.addEventListener("click", (event) => {
+    if (event.target === installDialog) {
+      installDialog.close();
+    }
+  });
 </script>
 
 <style>
-  .skill-dialog {
+  .skill-dialog,
+  .install-dialog {
     width: min(420px, calc(100vw - 32px));
-    min-height: min(300px, calc(100vh - 48px));
     padding: 0;
     border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
     border-radius: 8px;
@@ -127,7 +198,16 @@
     box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
   }
 
-  .skill-dialog::backdrop {
+  .skill-dialog {
+    min-height: min(300px, calc(100vh - 48px));
+  }
+
+  .install-dialog {
+    max-width: calc(100vw - 32px);
+  }
+
+  .skill-dialog::backdrop,
+  .install-dialog::backdrop {
     background: rgba(15, 23, 42, 0.48);
   }
 
@@ -143,6 +223,12 @@
     min-height: 0;
     padding: 1.75rem;
     overflow: auto;
+  }
+
+  .install-panel {
+    position: relative;
+    box-sizing: border-box;
+    padding: 1.75rem;
   }
 
   .card-footer {
@@ -250,13 +336,73 @@
     height: 1.25rem;
   }
 
-  .skill-dialog h2 {
+  .skill-dialog h2,
+  .install-dialog h2 {
     margin: 0;
     padding-right: 2.75rem;
     color: var(--text);
     font-size: 1.35rem;
     line-height: 1.25;
     overflow-wrap: anywhere;
+  }
+
+  .install-command-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+  }
+
+  .install-command-row code {
+    min-width: 0;
+    color: var(--text);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .copy-command {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: var(--surface);
+    cursor: pointer;
+  }
+
+  .copy-command:hover,
+  .copy-command:focus-visible {
+    color: var(--accent-hover);
+    border-color: var(--border-hover);
+  }
+
+  .copy-command:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .copy-command svg {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .copy-status {
+    min-height: 1.25rem;
+    margin: 0.75rem 0 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
   }
 
   .dialog-author {
