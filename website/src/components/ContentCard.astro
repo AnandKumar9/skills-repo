@@ -1,41 +1,42 @@
 ---
-interface Skill {
+interface ContentItem {
   name: string;
   description: string;
   tags: string[];
 }
 
 interface Props {
-  skill: Skill;
+  item: ContentItem;
+  dialogEnabled?: boolean;
 }
 
-const { skill } = Astro.props;
+const { item, dialogEnabled = false } = Astro.props;
 ---
 
 <article
   class="card"
-  role="button"
-  tabindex="0"
-  data-skill-card
-  data-skill-name={skill.name}
-  data-skill-description={skill.description}
-  data-skill-tags={skill.tags.join(", ")}
+  role={dialogEnabled ? "button" : undefined}
+  tabindex={dialogEnabled ? "0" : undefined}
+  data-skill-card={dialogEnabled ? true : undefined}
+  data-skill-name={dialogEnabled ? item.name : undefined}
+  data-skill-description={dialogEnabled ? item.description : undefined}
+  data-skill-tags={dialogEnabled ? item.tags.join(", ") : undefined}
   data-search-item
-  data-search-name={skill.name}
-  data-search-description={skill.description}
-  data-search-tags={skill.tags.join(" ")}
-  aria-label={`View details for ${skill.name}`}
+  data-search-name={item.name}
+  data-search-description={item.description}
+  data-search-tags={item.tags.join(" ")}
+  aria-label={dialogEnabled ? `View details for ${item.name}` : undefined}
 >
   <div class="card-content">
-    <h2>{skill.name}</h2>
-    {skill.description && <p>{skill.description}</p>}
+    <h2>{item.name}</h2>
+    {item.description && <p>{item.description}</p>}
   </div>
   <footer class="card-footer">
     <div class="footer-tags">
       {
-        skill.tags.length > 0 && (
+        item.tags.length > 0 && (
           <ul class="tag-list" aria-label="Tags">
-            {skill.tags.map((tag) => (
+            {item.tags.map((tag) => (
               <li>{tag}</li>
             ))}
           </ul>
@@ -57,7 +58,7 @@ const { skill } = Astro.props;
           />
         </svg>
       </a>
-      <a class="footer-icon-link" href="#" aria-label={`Download ${skill.name}`}>
+      <a class="footer-icon-link" href="#" aria-label={`Download ${item.name}`}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="none"
@@ -88,6 +89,9 @@ const { skill } = Astro.props;
     display: grid;
     grid-template-rows: minmax(0, 1fr) 36px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  }
+
+  .card[role="button"] {
     cursor: pointer;
   }
 

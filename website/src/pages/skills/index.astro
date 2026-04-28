@@ -1,7 +1,7 @@
 ---
+import ContentCard from "../../components/ContentCard.astro";
 import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
-import SkillCard from "../../components/SkillCard.astro";
 import SkillDialog from "../../components/SkillDialog.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { getSkills } from "../../lib/repoContent.mjs";
@@ -20,7 +20,7 @@ const skills = getSkills();
     <p class="search-status" data-search-status aria-live="polite"></p>
 
     <section class="grid" data-view-container data-view-mode="grid">
-      {skills.map((skill) => <SkillCard skill={skill} />)}
+      {skills.map((skill) => <ContentCard item={skill} dialogEnabled />)}
     </section>
 
     <p class="empty-state" data-search-empty hidden>No skills match that search.</p>

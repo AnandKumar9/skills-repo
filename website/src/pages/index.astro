@@ -1,9 +1,8 @@
 ---
 import PageHeading from "../components/PageHeading.astro";
 import SearchViewControls from "../components/SearchViewControls.astro";
-import SkillCard from "../components/SkillCard.astro";
+import ContentCard from "../components/ContentCard.astro";
 import SkillDialog from "../components/SkillDialog.astro";
-import SubagentCard from "../components/SubagentCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import { getSkills, getSubagents } from "../lib/repoContent.mjs";
 
@@ -25,7 +24,7 @@ const featuredSubagents = getSubagents().slice(0, 6);
       </div>
 
       <div class="grid" data-view-mode="grid">
-        {featuredSkills.map((skill) => <SkillCard skill={skill} />)}
+        {featuredSkills.map((skill) => <ContentCard item={skill} dialogEnabled />)}
       </div>
     </section>
 
@@ -36,7 +35,7 @@ const featuredSubagents = getSubagents().slice(0, 6);
       </div>
 
       <div class="grid" data-view-mode="grid">
-        {featuredSubagents.map((subagent) => <SubagentCard subagent={subagent} />)}
+        {featuredSubagents.map((subagent) => <ContentCard item={subagent} dialogEnabled />)}
       </div>
     </section>
 

@@ -1,8 +1,8 @@
 ---
+import ContentCard from "../../components/ContentCard.astro";
 import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
 import SkillDialog from "../../components/SkillDialog.astro";
-import SubagentCard from "../../components/SubagentCard.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { getSubagents } from "../../lib/repoContent.mjs";
 
@@ -22,7 +22,7 @@ const subagents = getSubagents();
     <p class="search-status" data-search-status aria-live="polite"></p>
 
     <section class="grid" data-view-container data-view-mode="grid">
-      {subagents.map((subagent) => <SubagentCard subagent={subagent} />)}
+      {subagents.map((subagent) => <ContentCard item={subagent} dialogEnabled />)}
     </section>
 
     <p class="empty-state" data-search-empty hidden>No subagents match that search.</p>
