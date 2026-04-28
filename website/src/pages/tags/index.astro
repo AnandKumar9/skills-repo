@@ -20,6 +20,7 @@ const subagents = getSubagents();
       tags.length > 0 ? (
         <>
           <SearchViewControls
+            requireTagSelection
             showSearch={false}
             showViewToggle={false}
             resultLabelSingular="item"
@@ -29,7 +30,7 @@ const subagents = getSubagents();
 
           <p class="search-status" data-search-status aria-live="polite"></p>
 
-          <section class="skills-section" aria-labelledby="tags-skills-title">
+          <section class="skills-section" data-search-section aria-labelledby="tags-skills-title">
             <div class="section-header">
               <h2 id="tags-skills-title">Skills</h2>
               <a class="view-all" href={`${baseUrl}skills/`}>View All</a>
@@ -40,7 +41,7 @@ const subagents = getSubagents();
             </div>
           </section>
 
-          <section class="content-section" aria-labelledby="tags-subagents-title">
+          <section class="content-section" data-search-section aria-labelledby="tags-subagents-title">
             <div class="section-header">
               <h2 id="tags-subagents-title">Subagents</h2>
               <a class="view-all" href={`${baseUrl}subagents/`}>View All</a>

@@ -1,5 +1,6 @@
 ---
 interface Props {
+  requireTagSelection?: boolean;
   resultLabelPlural?: string;
   resultLabelSingular?: string;
   searchPlaceholder?: string;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const {
+  requireTagSelection = false,
   resultLabelPlural = "items",
   resultLabelSingular = "item",
   searchPlaceholder = "Search",
@@ -21,6 +23,7 @@ const {
 <div
   class="search-view-stack"
   data-search-view-controls
+  data-require-tag-selection={requireTagSelection ? "true" : undefined}
   data-result-label-singular={resultLabelSingular}
   data-result-label-plural={resultLabelPlural}
   aria-label="Search and view controls"
@@ -102,10 +105,12 @@ const {
     const viewContainer = page?.querySelector<HTMLElement>("[data-view-container]");
     const searchInput = controls.querySelector<HTMLInputElement>("[data-search-input]");
     const searchItems = page?.querySelectorAll<HTMLElement>("[data-search-item]");
+    const searchSections = page?.querySelectorAll<HTMLElement>("[data-search-section]");
     const searchStatus = page?.querySelector<HTMLElement>("[data-search-status]");
     const emptyState = page?.querySelector<HTMLElement>("[data-search-empty]");
     const buttons = controls.querySelectorAll<HTMLButtonElement>("[data-view-mode-button]");
     const tagButtons = controls.querySelectorAll<HTMLButtonElement>("[data-tag-filter]");
+    const requiresTagSelection = controls.dataset.requireTagSelection === "true";
     const activeTags = new Set<string>();
 
     function isViewMode(mode: string): mode is "grid" | "list" {
@@ -172,15 +177,17 @@ const {
       if (!searchItems) return;
 
       const query = searchInput?.value.trim().toLowerCase() ?? "";
-      const currentView = viewContainer?.dataset.viewMode ?? "grid";
+      const needsTagSelection = requiresTagSelection && activeTags.size === 0;
+      const hasActiveFilter = query.length > 0 || activeTags.size > 0;
       let visibleCount = 0;
 
       searchItems.forEach((item) => {
+        const isDefaultHidden = item.dataset.searchDefaultHidden === "true";
         const itemTags = getItemTags(item);
         const matchesQuery = query.length === 0 || getSearchText(item).includes(query);
         const matchesTags =
           activeTags.size === 0 || Array.from(activeTags).some((tag) => itemTags.includes(tag.toLowerCase()));
-        const isVisible = matchesQuery && matchesTags;
+        const isVisible = !needsTagSelection && matchesQuery && matchesTags && (hasActiveFilter || !isDefaultHidden);
         item.hidden = !isVisible;
 
         if (isVisible) {
@@ -188,12 +195,19 @@ const {
         }
       });
 
+      searchSections?.forEach((section) => {
+        const hasVisibleItem = Array.from(section.querySelectorAll<HTMLElement>("[data-search-item]")).some(
+          (item) => !item.hidden
+        );
+        section.hidden = !hasVisibleItem;
+      });
+
       if (searchStatus) {
-        searchStatus.textContent = formatSearchStatus(visibleCount, query);
+        searchStatus.textContent = needsTagSelection ? "" : formatSearchStatus(visibleCount, query);
       }
 
       if (emptyState) {
-        emptyState.hidden = visibleCount > 0;
+        emptyState.hidden = needsTagSelection || visibleCount > 0;
       }
     }
 

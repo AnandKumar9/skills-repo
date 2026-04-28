@@ -6,15 +6,17 @@ interface ContentItem {
 }
 
 interface Props {
+  defaultHidden?: boolean;
   item: ContentItem;
   dialogEnabled?: boolean;
 }
 
-const { item, dialogEnabled = false } = Astro.props;
+const { defaultHidden = false, item, dialogEnabled = false } = Astro.props;
 ---
 
 <article
   class="card"
+  hidden={defaultHidden}
   role={dialogEnabled ? "button" : undefined}
   tabindex={dialogEnabled ? "0" : undefined}
   data-skill-card={dialogEnabled ? true : undefined}
@@ -22,6 +24,7 @@ const { item, dialogEnabled = false } = Astro.props;
   data-skill-description={dialogEnabled ? item.description : undefined}
   data-skill-tags={dialogEnabled ? item.tags.join(", ") : undefined}
   data-search-item
+  data-search-default-hidden={defaultHidden ? "true" : undefined}
   data-search-name={item.name}
   data-search-description={item.description}
   data-search-tags={item.tags.join("|")}

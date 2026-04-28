@@ -8,8 +8,8 @@ import { getDeclaredTags, getSkills, getSubagents } from "../lib/repoContent.mjs
 
 const baseUrl = import.meta.env.BASE_URL;
 const tags = getDeclaredTags();
-const featuredSkills = getSkills().slice(0, 6);
-const featuredSubagents = getSubagents().slice(0, 6);
+const skills = getSkills();
+const subagents = getSubagents();
 ---
 
 <SiteLayout>
@@ -18,25 +18,25 @@ const featuredSubagents = getSubagents().slice(0, 6);
 
     <SearchViewControls showViewToggle={false} tags={tags} />
 
-    <section class="skills-section" aria-labelledby="home-skills-title">
+    <section class="skills-section" data-search-section aria-labelledby="home-skills-title">
       <div class="section-header">
         <h2 id="home-skills-title">Skills</h2>
         <a class="view-all" href={`${baseUrl}skills/`}>View All</a>
       </div>
 
       <div class="grid" data-view-mode="grid">
-        {featuredSkills.map((skill) => <ContentCard item={skill} dialogEnabled />)}
+        {skills.map((skill, index) => <ContentCard item={skill} defaultHidden={index >= 6} dialogEnabled />)}
       </div>
     </section>
 
-    <section class="content-section" aria-labelledby="home-subagents-title">
+    <section class="content-section" data-search-section aria-labelledby="home-subagents-title">
       <div class="section-header">
         <h2 id="home-subagents-title">Subagents</h2>
         <a class="view-all" href={`${baseUrl}subagents/`}>View All</a>
       </div>
 
       <div class="grid" data-view-mode="grid">
-        {featuredSubagents.map((subagent) => <ContentCard item={subagent} dialogEnabled />)}
+        {subagents.map((subagent, index) => <ContentCard item={subagent} defaultHidden={index >= 6} dialogEnabled />)}
       </div>
     </section>
 
