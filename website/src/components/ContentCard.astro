@@ -24,7 +24,7 @@ const { item, dialogEnabled = false } = Astro.props;
   data-search-item
   data-search-name={item.name}
   data-search-description={item.description}
-  data-search-tags={item.tags.join(" ")}
+  data-search-tags={item.tags.join("|")}
   aria-label={dialogEnabled ? `View details for ${item.name}` : undefined}
 >
   <div class="card-content">

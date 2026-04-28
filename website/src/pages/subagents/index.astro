@@ -4,8 +4,9 @@ import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
 import SkillDialog from "../../components/SkillDialog.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
-import { getSubagents } from "../../lib/repoContent.mjs";
+import { getDeclaredTags, getSubagents } from "../../lib/repoContent.mjs";
 
+const tags = getDeclaredTags();
 const subagents = getSubagents();
 ---
 
@@ -17,6 +18,7 @@ const subagents = getSubagents();
       searchPlaceholder="Search subagents"
       resultLabelSingular="subagent"
       resultLabelPlural="subagents"
+      tags={tags}
     />
 
     <p class="search-status" data-search-status aria-live="polite"></p>

@@ -4,9 +4,10 @@ import SearchViewControls from "../components/SearchViewControls.astro";
 import ContentCard from "../components/ContentCard.astro";
 import SkillDialog from "../components/SkillDialog.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { getSkills, getSubagents } from "../lib/repoContent.mjs";
+import { getDeclaredTags, getSkills, getSubagents } from "../lib/repoContent.mjs";
 
 const baseUrl = import.meta.env.BASE_URL;
+const tags = getDeclaredTags();
 const featuredSkills = getSkills().slice(0, 6);
 const featuredSubagents = getSubagents().slice(0, 6);
 ---
@@ -15,7 +16,7 @@ const featuredSubagents = getSubagents().slice(0, 6);
   <main class="home">
     <PageHeading isHome />
 
-    <SearchViewControls showViewToggle={false} />
+    <SearchViewControls showViewToggle={false} tags={tags} />
 
     <section class="skills-section" aria-labelledby="home-skills-title">
       <div class="section-header">

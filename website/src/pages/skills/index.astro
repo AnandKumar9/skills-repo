@@ -4,8 +4,9 @@ import PageHeading from "../../components/PageHeading.astro";
 import SearchViewControls from "../../components/SearchViewControls.astro";
 import SkillDialog from "../../components/SkillDialog.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
-import { getSkills } from "../../lib/repoContent.mjs";
+import { getDeclaredTags, getSkills } from "../../lib/repoContent.mjs";
 
+const tags = getDeclaredTags();
 const skills = getSkills();
 ---
 
@@ -15,7 +16,12 @@ const skills = getSkills();
   <main class="page">
     <PageHeading pageTitle="Skills" pageDescription="Browse all skill folders from the repo." />
 
-    <SearchViewControls searchPlaceholder="Search skills" resultLabelSingular="skill" resultLabelPlural="skills" />
+    <SearchViewControls
+      searchPlaceholder="Search skills"
+      resultLabelSingular="skill"
+      resultLabelPlural="skills"
+      tags={tags}
+    />
 
     <p class="search-status" data-search-status aria-live="polite"></p>
 

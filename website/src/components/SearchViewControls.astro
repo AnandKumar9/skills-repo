@@ -4,6 +4,7 @@ interface Props {
   resultLabelSingular?: string;
   searchPlaceholder?: string;
   showViewToggle?: boolean;
+  tags?: string[];
 }
 
 const {
@@ -11,61 +12,78 @@ const {
   resultLabelSingular = "item",
   searchPlaceholder = "Search",
   showViewToggle = true,
+  tags = [],
 } = Astro.props;
 ---
 
-<div
-  class="search-view-controls"
-  data-search-view-controls
-  data-result-label-singular={resultLabelSingular}
-  data-result-label-plural={resultLabelPlural}
-  aria-label="Search and view controls"
->
-  <label class="search-field">
-    <span class="sr-only">Search</span>
-    <input type="search" placeholder={searchPlaceholder} data-search-input />
-  </label>
+<div class="search-view-stack">
+  <div
+    class="search-view-controls"
+    data-search-view-controls
+    data-result-label-singular={resultLabelSingular}
+    data-result-label-plural={resultLabelPlural}
+    aria-label="Search and view controls"
+  >
+    <label class="search-field">
+      <span class="sr-only">Search</span>
+      <input type="search" placeholder={searchPlaceholder} data-search-input />
+    </label>
+
+    {
+      showViewToggle && (
+        <div class="view-toggle" aria-label="View mode">
+          <button
+            class="view-toggle-button is-active"
+            type="button"
+            data-view-mode-button="grid"
+            aria-pressed="true"
+            aria-label="Grid view"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
+              />
+            </svg>
+          </button>
+          <button
+            class="view-toggle-button"
+            type="button"
+            data-view-mode-button="list"
+            aria-pressed="false"
+            aria-label="List view"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
+              />
+            </svg>
+          </button>
+        </div>
+      )
+    }
+  </div>
 
   {
-    showViewToggle && (
-      <div class="view-toggle" aria-label="View mode">
-        <button
-          class="view-toggle-button is-active"
-          type="button"
-          data-view-mode-button="grid"
-          aria-pressed="true"
-          aria-label="Grid view"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
-            />
-          </svg>
-        </button>
-        <button
-          class="view-toggle-button"
-          type="button"
-          data-view-mode-button="list"
-          aria-pressed="false"
-          aria-label="List view"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"
-            />
-          </svg>
-        </button>
-      </div>
+    tags.length > 0 && (
+      <ul class="tag-pill-list" aria-label="Available tags">
+        {tags.map((tag) => (
+          <li>
+            <button type="button" data-tag-filter={tag} aria-pressed="false">
+              {tag}
+            </button>
+          </li>
+        ))}
+      </ul>
     )
   }
 </div>
@@ -81,6 +99,8 @@ const {
     const searchStatus = page?.querySelector<HTMLElement>("[data-search-status]");
     const emptyState = page?.querySelector<HTMLElement>("[data-search-empty]");
     const buttons = controls.querySelectorAll<HTMLButtonElement>("[data-view-mode-button]");
+    const tagButtons = controls.parentElement?.querySelectorAll<HTMLButtonElement>("[data-tag-filter]");
+    const activeTags = new Set<string>();
 
     function isViewMode(mode: string): mode is "grid" | "list" {
       return mode === "grid" || mode === "list";
@@ -115,6 +135,32 @@ const {
       return `${count} ${count === 1 ? singular : plural}`;
     }
 
+    function getItemTags(item: HTMLElement) {
+      return (item.dataset.searchTags ?? "")
+        .toLowerCase()
+        .split("|")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+    }
+
+    function formatSearchStatus(count: number, query: string) {
+      const tagList = Array.from(activeTags);
+
+      if (query.length === 0 && tagList.length === 0) {
+        return `${formatResultCount(count)} shown`;
+      }
+
+      if (query.length > 0 && tagList.length > 0) {
+        return `${formatResultCount(count)} found for "${searchInput?.value.trim()}" in ${tagList.join(", ")}`;
+      }
+
+      if (query.length > 0) {
+        return `${formatResultCount(count)} found for "${searchInput?.value.trim()}"`;
+      }
+
+      return `${formatResultCount(count)} found in ${tagList.join(", ")}`;
+    }
+
     function updateSearchResults() {
       if (!searchInput || !searchItems) return;
 
@@ -123,7 +169,10 @@ const {
       let visibleCount = 0;
 
       searchItems.forEach((item) => {
-        const isVisible = query.length === 0 || getSearchText(item).includes(query);
+        const itemTags = getItemTags(item);
+        const matchesQuery = query.length === 0 || getSearchText(item).includes(query);
+        const matchesTags = activeTags.size === 0 || Array.from(activeTags).some((tag) => itemTags.includes(tag));
+        const isVisible = matchesQuery && matchesTags;
         item.hidden = !isVisible;
 
         if (isVisible) {
@@ -132,10 +181,7 @@ const {
       });
 
       if (searchStatus) {
-        searchStatus.textContent =
-          query.length === 0
-            ? `${formatResultCount(visibleCount)} shown`
-            : `${formatResultCount(visibleCount)} found for "${searchInput.value.trim()}"`;
+        searchStatus.textContent = formatSearchStatus(visibleCount, query);
       }
 
       if (emptyState) {
@@ -171,18 +217,43 @@ const {
       setViewMode(getStoredViewMode() ?? viewContainer.dataset.viewMode ?? "grid", false);
     }
 
+    tagButtons?.forEach((button) => {
+      button.addEventListener("click", () => {
+        const tag = button.dataset.tagFilter?.toLowerCase();
+        if (!tag) return;
+
+        if (activeTags.has(tag)) {
+          activeTags.delete(tag);
+        } else {
+          activeTags.add(tag);
+        }
+
+        const isActive = activeTags.has(tag);
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+        updateSearchResults();
+      });
+    });
+
     searchInput?.addEventListener("input", updateSearchResults);
     updateSearchResults();
   });
 </script>
 
 <style>
+  .search-view-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: -8px 0 32px;
+  }
+
   .search-view-controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin: -8px 0 32px;
+    margin: 0;
   }
 
   .search-field {
@@ -256,6 +327,49 @@ const {
     display: block;
     width: 1.125rem;
     height: 1.125rem;
+  }
+
+  .tag-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag-pill-list button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--surface);
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .tag-pill-list button:hover,
+  .tag-pill-list button:focus-visible {
+    border-color: var(--border-hover);
+    color: var(--accent-hover);
+  }
+
+  .tag-pill-list button:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .tag-pill-list button.is-active {
+    border-color: var(--accent);
+    color: var(--surface);
+    background: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), var(--card-shadow);
   }
 
   .sr-only {
