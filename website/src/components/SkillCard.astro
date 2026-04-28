@@ -1,0 +1,277 @@
+---
+interface Skill {
+  name: string;
+  description: string;
+  tags: string[];
+}
+
+interface Props {
+  skill: Skill;
+}
+
+const { skill } = Astro.props;
+---
+
+<article
+  class="card"
+  role="button"
+  tabindex="0"
+  data-skill-card
+  data-skill-name={skill.name}
+  data-skill-description={skill.description}
+  data-skill-tags={skill.tags.join(", ")}
+  data-search-item
+  data-search-name={skill.name}
+  data-search-description={skill.description}
+  data-search-tags={skill.tags.join(" ")}
+  aria-label={`View details for ${skill.name}`}
+>
+  <div class="card-content">
+    <h2>{skill.name}</h2>
+    {skill.description && <p>{skill.description}</p>}
+  </div>
+  <footer class="card-footer">
+    <div class="footer-tags">
+      {
+        skill.tags.length > 0 && (
+          <ul class="tag-list" aria-label="Tags">
+            {skill.tags.map((tag) => (
+              <li>{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+    <div class="footer-actions">
+      <a
+        class="footer-icon-link"
+        href="https://github.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open GitHub"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.15c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.92 10.92 0 0 1 12 6.05c.98 0 1.95.13 2.87.38 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.82 1.19 3.08 0 4.42-2.69 5.39-5.25 5.68.42.36.78 1.07.78 2.16v3.14c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"
+          />
+        </svg>
+      </a>
+      <a class="footer-icon-link" href="#" aria-label={`Download ${skill.name}`}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
+          />
+        </svg>
+      </a>
+    </div>
+  </footer>
+</article>
+
+<style>
+  .card {
+    box-sizing: border-box;
+    min-width: 300px;
+    height: 180px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: none;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 36px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+  }
+
+  .card[hidden] {
+    display: none;
+  }
+
+  :global(.grid[data-view-mode="list"]) .card {
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    grid-template-columns: minmax(0, 1fr) 76px;
+    grid-template-rows: 1fr;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    border-color: var(--border-hover);
+    color: var(--accent-hover);
+    box-shadow: var(--card-shadow);
+  }
+
+  :global(.grid[data-view-mode="list"]) .card:hover,
+  :global(.grid[data-view-mode="list"]) .card:focus-visible {
+    border-color: var(--border);
+    border-bottom-color: var(--border);
+    color: var(--text);
+    background: var(--bg);
+    box-shadow: none;
+  }
+
+  .card:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .card-content {
+    min-height: 0;
+    padding: 1.25rem 1.25rem 0.875rem;
+    overflow: hidden;
+  }
+
+  :global(.grid[data-view-mode="list"]) .card-content {
+    display: grid;
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .card h2 {
+    margin: 0 0 0.75rem;
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  :global(.grid[data-view-mode="list"]) .card h2 {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card p {
+    display: -webkit-box;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.925rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+  }
+
+  :global(.grid[data-view-mode="list"]) .card p {
+    display: block;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+  }
+
+  .tag-list li {
+    flex: 0 0 auto;
+    padding: 0.1875rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--bg);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  :global(.grid[data-view-mode="list"]) .tag-list {
+    display: none;
+  }
+
+  .card-footer {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    height: 36px;
+    padding: 0 1rem;
+    background: var(--surface);
+  }
+
+  :global(.grid[data-view-mode="list"]) .card-footer {
+    align-self: stretch;
+    width: 76px;
+    display: flex;
+    justify-content: flex-end;
+    height: auto;
+    padding: 0 1rem 0 0;
+    background: transparent;
+  }
+
+  .footer-tags {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .footer-actions {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.625rem;
+  }
+
+  .footer-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .footer-icon-link svg {
+    display: block;
+    flex: 0 0 auto;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .card {
+      min-width: 0;
+    }
+
+    :global(.grid[data-view-mode="list"]) .card {
+      height: 56px;
+    }
+
+    :global(.grid[data-view-mode="list"]) .card-content {
+      display: block;
+      padding: 0.625rem 1rem;
+    }
+
+    :global(.grid[data-view-mode="list"]) .card h2 {
+      width: auto;
+      margin-bottom: 0.25rem;
+    }
+  }
+</style>

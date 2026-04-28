@@ -1,9 +1,15 @@
 ---
 import PageHeading from "../components/PageHeading.astro";
 import SearchViewControls from "../components/SearchViewControls.astro";
+import SkillCard from "../components/SkillCard.astro";
+import SkillDialog from "../components/SkillDialog.astro";
+import SubagentCard from "../components/SubagentCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
+import { getSkills, getSubagents } from "../lib/repoContent.mjs";
 
 const baseUrl = import.meta.env.BASE_URL;
+const featuredSkills = getSkills().slice(0, 6);
+const featuredSubagents = getSubagents().slice(0, 6);
 ---
 
 <SiteLayout>
@@ -12,41 +18,97 @@ const baseUrl = import.meta.env.BASE_URL;
 
     <SearchViewControls showViewToggle={false} />
 
-    <div class="cards">
-      <a href={`${baseUrl}skills/`}>Skills</a>
-      <a href={`${baseUrl}subagents/`}>Subagents</a>
-      <a href={`${baseUrl}ai-field-guide/`}>AI Field Guide</a>
-    </div>
+    <section class="skills-section" aria-labelledby="home-skills-title">
+      <div class="section-header">
+        <h2 id="home-skills-title">Skills</h2>
+        <a class="view-all" href={`${baseUrl}skills/`}>View All</a>
+      </div>
+
+      <div class="grid" data-view-mode="grid">
+        {featuredSkills.map((skill) => <SkillCard skill={skill} />)}
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="home-subagents-title">
+      <div class="section-header">
+        <h2 id="home-subagents-title">Subagents</h2>
+        <a class="view-all" href={`${baseUrl}subagents/`}>View All</a>
+      </div>
+
+      <div class="grid" data-view-mode="grid">
+        {featuredSubagents.map((subagent) => <SubagentCard subagent={subagent} />)}
+      </div>
+    </section>
+
+    <SkillDialog />
   </main>
 </SiteLayout>
 
 <style>
   .home {
-    max-width: 960px;
+    max-width: 1000px;
     margin: 0 auto;
     text-align: left;
   }
 
-  .cards {
+  .skills-section,
+  .content-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
 
-  .cards a {
-    min-width: 180px;
-    border: 1px solid var(--border);
-    padding: 1rem 1.125rem;
-    text-decoration: none;
-    border-radius: 8px;
-    background: var(--surface);
+  .section-header h2 {
+    margin: 0;
     color: var(--text);
-    font-weight: 600;
+    font-size: 1.35rem;
+    line-height: 1.2;
   }
 
-  .cards a:hover {
+  .view-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: var(--surface);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .view-all:hover,
+  .view-all:focus-visible {
     border-color: var(--border-hover);
     color: var(--accent-hover);
     box-shadow: var(--card-shadow);
+  }
+
+  .view-all:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

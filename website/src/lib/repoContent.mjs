@@ -82,3 +82,52 @@ export function getMarkdownMetadata(markdownPath, declaredTags = getDeclaredTags
     tags: [...new Set(tags)],
   };
 }
+
+export function getSkills() {
+  const skillsDir = getRepoPath("skills");
+  const declaredTags = getDeclaredTags();
+
+  return fs
+    .readdirSync(skillsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => {
+      const skillPath = path.join(skillsDir, entry.name, "SKILL.md");
+      const metadata = fs.existsSync(skillPath)
+        ? getMarkdownMetadata(skillPath, declaredTags)
+        : { description: "", tags: [] };
+
+      return {
+        name: entry.name,
+        description: metadata.description,
+        tags: metadata.tags,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export function getSubagents() {
+  const subagentsDir = getRepoPath("subagents");
+  const declaredTags = getDeclaredTags();
+
+  return fs
+    .readdirSync(subagentsDir, { withFileTypes: true })
+    .filter((entry) => {
+      if (entry.isDirectory()) return true;
+      if (entry.isFile() && entry.name.endsWith(".md")) return true;
+      return false;
+    })
+    .map((entry) => {
+      const subagentPath = path.join(subagentsDir, entry.name);
+      const metadata =
+        entry.isFile() && entry.name.endsWith(".md")
+          ? getMarkdownMetadata(subagentPath, declaredTags)
+          : { description: "", tags: [] };
+
+      return {
+        name: entry.name,
+        description: metadata.description,
+        tags: metadata.tags,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
