@@ -22,6 +22,7 @@ function findRepoRoot(startDir) {
 const repoRoot = findRepoRoot(process.cwd());
 const tagsPath = path.join(repoRoot, "website", "content-tags.yml");
 const contentUpdatesPath = path.join(repoRoot, "website", "content-updates.yml");
+const announcementsPath = path.join(repoRoot, "website", "announcements.yml");
 const repositoryUrl = (process.env.PUBLIC_REPOSITORY_URL ?? "https://github.com/AnandKumar9/skills-repo").replace(
   /\/$/,
   "",
@@ -91,6 +92,77 @@ function normalizeAuthor(value) {
 
   const author = value.trim();
   return /^[A-Za-z]{3}\d{3}$/.test(author) ? author : "";
+}
+
+function normalizeAnnouncementDate(value) {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
+
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? null : new Date(timestamp);
+}
+
+function normalizeAnnouncementPart(part) {
+  if (!part || typeof part !== "object" || typeof part.text !== "string") {
+    return null;
+  }
+
+  const text = part.text;
+  const href = typeof part.href === "string" ? part.href.trim() : "";
+
+  if (!text.trim()) {
+    return null;
+  }
+
+  return href ? { text, href } : { text };
+}
+
+function normalizeAnnouncement(announcement) {
+  if (!announcement || typeof announcement !== "object" || announcement.enabled === false) {
+    return null;
+  }
+
+  const parts = Array.isArray(announcement.parts)
+    ? announcement.parts.map(normalizeAnnouncementPart).filter(Boolean)
+    : [];
+
+  if (parts.length === 0) {
+    return null;
+  }
+
+  const title = typeof announcement.title === "string" ? announcement.title.trim() : "";
+  const tone = typeof announcement.tone === "string" ? announcement.tone.trim().toLowerCase() : "info";
+  const startsAt = normalizeAnnouncementDate(announcement.startsAt);
+  const expiresAt = normalizeAnnouncementDate(announcement.expiresAt);
+
+  return {
+    title,
+    parts,
+    tone: ["info", "success", "warning"].includes(tone) ? tone : "info",
+    startsAt,
+    expiresAt,
+  };
+}
+
+function isActiveAnnouncement(announcement, now = new Date()) {
+  if (!announcement) {
+    return false;
+  }
+
+  if (announcement.startsAt && announcement.startsAt > now) {
+    return false;
+  }
+
+  if (announcement.expiresAt && announcement.expiresAt < now) {
+    return false;
+  }
+
+  return true;
 }
 
 function normalizeMarkdownAuthors(metadata) {
@@ -169,6 +241,28 @@ export function getContentUpdates() {
   }
 
   return normalizeContentUpdates(updates);
+}
+
+export function getActiveAnnouncements({ limit = 2, now = new Date() } = {}) {
+  if (!fs.existsSync(announcementsPath)) {
+    return [];
+  }
+
+  const data = yaml.load(fs.readFileSync(announcementsPath, "utf-8"));
+  const announcements = Array.isArray(data?.announcements) ? data.announcements : [];
+
+  return announcements
+    .map(normalizeAnnouncement)
+    .filter((announcement) => isActiveAnnouncement(announcement, now))
+    .slice(0, limit)
+    .map((announcement) => {
+      const { startsAt, expiresAt, ...publicAnnouncement } = announcement;
+      return publicAnnouncement;
+    });
+}
+
+export function getActiveAnnouncement(now = new Date()) {
+  return getActiveAnnouncements({ limit: 1, now })[0] ?? null;
 }
 
 export function sortByRecentUpdate(items, collectionName, updates = getContentUpdates()) {

@@ -26,7 +26,15 @@ const navSections = [
   },
 ];
 
-const currentPath = Astro.url.pathname;
+const currentPath = normalizePath(Astro.url.pathname);
+
+function normalizePath(pathname: string) {
+  if (pathname.endsWith("/")) {
+    return pathname;
+  }
+
+  return `${pathname}/`;
+}
 
 function withBase(href: string) {
   if (href === "/") {
@@ -37,7 +45,7 @@ function withBase(href: string) {
 }
 
 function isActive(href: string) {
-  const basedHref = withBase(href);
+  const basedHref = normalizePath(withBase(href));
 
   if (basedHref === baseUrl) {
     return currentPath === basedHref;

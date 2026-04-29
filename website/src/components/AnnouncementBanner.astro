@@ -1,0 +1,172 @@
+---
+interface AnnouncementPart {
+  text: string;
+  href?: string;
+}
+
+interface Announcement {
+  title?: string;
+  parts: AnnouncementPart[];
+  tone?: string;
+}
+
+interface Props {
+  announcement?: Announcement | null;
+  announcements?: Announcement[];
+}
+
+const { announcement = null, announcements } = Astro.props;
+const visibleAnnouncements = (announcements ?? (announcement ? [announcement] : [])).slice(0, 2);
+const baseUrl = import.meta.env.BASE_URL;
+
+function normalizeInternalHref(href: string) {
+  const [pathAndQuery, hash = ""] = href.split("#", 2);
+  const [pathname, query = ""] = pathAndQuery.split("?", 2);
+  const normalizedPathname = pathname.endsWith("/") || /\.[^/]+$/.test(pathname) ? pathname : `${pathname}/`;
+  const normalizedQuery = query ? `?${query}` : "";
+  const normalizedHash = hash ? `#${hash}` : "";
+
+  return `${normalizedPathname}${normalizedQuery}${normalizedHash}`;
+}
+
+function getHref(href: string) {
+  if (/^(?:[a-z][a-z0-9+.-]*:|#)/i.test(href)) {
+    return href;
+  }
+
+  if (/^www\./i.test(href)) {
+    return `https://${href}`;
+  }
+
+  return `${baseUrl}${normalizeInternalHref(href).replace(/^\//, "")}`;
+}
+
+function isExternalHref(href: string) {
+  return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(href) || /^www\./i.test(href);
+}
+
+function isAiFieldGuideHref(href: string) {
+  const normalizedHref = href.replace(new RegExp(`^${baseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`), "/");
+  return normalizedHref.startsWith("/ai-field-guide/");
+}
+
+function shouldOpenInNewTab(href: string) {
+  return isExternalHref(href) || isAiFieldGuideHref(href);
+}
+---
+
+{
+  visibleAnnouncements.length > 0 && (
+    <section class="announcement-stack" aria-label="Announcements">
+      {visibleAnnouncements.map((announcement) => (
+        <aside class={`announcement announcement-${announcement.tone ?? "info"}`}>
+          <div class="announcement-copy">
+            {announcement.title && <p class="announcement-title">{announcement.title}</p>}
+            <p class="announcement-message">
+              {announcement.parts.map((part) =>
+                part.href ? (
+                  <a
+                    href={getHref(part.href)}
+                    target={shouldOpenInNewTab(part.href) ? "_blank" : undefined}
+                    rel={shouldOpenInNewTab(part.href) ? "noopener noreferrer" : undefined}
+                  >
+                    {part.text}
+                  </a>
+                ) : (
+                  <span>{part.text}</span>
+                ),
+              )}
+            </p>
+          </div>
+        </aside>
+      ))}
+    </section>
+  )
+}
+
+<style>
+  .announcement-stack {
+    display: grid;
+    gap: 0.75rem;
+    margin: -12px 0 32px;
+  }
+
+  .announcement {
+    box-sizing: border-box;
+    max-height: 8.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+
+  .announcement-copy {
+    padding: 16px 18px;
+  }
+
+  .announcement-title,
+  .announcement-message {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+  }
+
+  .announcement-title {
+    -webkit-line-clamp: 1;
+    margin: 0 0 0.35rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .announcement-message {
+    -webkit-line-clamp: 2;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .announcement-message a {
+    color: var(--accent);
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .announcement-message a:hover,
+  .announcement-message a:focus-visible {
+    color: var(--accent-hover);
+  }
+
+  .announcement-message a:focus-visible {
+    border-radius: 4px;
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .announcement-warning {
+    border-left-color: #d97706;
+  }
+
+  .announcement-success {
+    border-left-color: #059669;
+  }
+
+  @media (max-width: 640px) {
+    .announcement-stack {
+      margin-bottom: 28px;
+    }
+
+    .announcement {
+      max-height: 10rem;
+    }
+
+    .announcement-copy {
+      padding: 14px 16px;
+    }
+  }
+</style>

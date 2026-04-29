@@ -1,0 +1,25 @@
+announcements:
+  - enabled: true
+    tone: "info"
+    title: "New AI Field Guide pages are available"
+    parts:
+      - text: "Browse the latest "
+      - text: "prompting guide"
+        href: "/rules"
+      - text: ", "
+      - text: "agent patterns"
+        href: "/ai-field-guide/agents/"
+      - text: ", and operations guidance added to the hub."
+    startsAt: "2026-04-28"
+    expiresAt: "2026-05-31"
+
+  - enabled: true
+    tone: "success"
+    title: "Rules collection has been refreshed"
+    parts:
+      - text: "Review the updated "
+      - text: "rules index"
+        href: "/rules"
+      - text: " and related guidance."
+    startsAt: "2026-04-29"
+    expiresAt: "2026-05-15"

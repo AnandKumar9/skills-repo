@@ -1,11 +1,13 @@
 ---
 import PageHeading from "../components/PageHeading.astro";
+import AnnouncementBanner from "../components/AnnouncementBanner.astro";
 import SearchViewControls from "../components/SearchViewControls.astro";
 import ContentCard from "../components/ContentCard.astro";
 import SkillDialog from "../components/SkillDialog.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import {
   getContentUpdates,
+  getActiveAnnouncements,
   getDeclaredTags,
   getRules,
   getSkills,
@@ -15,6 +17,7 @@ import {
 
 const baseUrl = import.meta.env.BASE_URL;
 const tags = getDeclaredTags();
+const announcements = getActiveAnnouncements();
 const contentUpdates = getContentUpdates();
 const skills = sortByRecentUpdate(getSkills(), "skills", contentUpdates);
 const subagents = sortByRecentUpdate(getSubagents(), "subagents", contentUpdates);
@@ -24,6 +27,8 @@ const rules = sortByRecentUpdate(getRules(), "rules", contentUpdates);
 <SiteLayout>
   <main class="home">
     <PageHeading isHome />
+
+    <AnnouncementBanner announcements={announcements} />
 
     <SearchViewControls showViewToggle={false} tags={tags} />
 
