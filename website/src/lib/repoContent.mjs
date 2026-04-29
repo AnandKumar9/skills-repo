@@ -8,7 +8,7 @@ function findRepoRoot(startDir) {
   while (currentDir !== path.dirname(currentDir)) {
     if (
       fs.existsSync(path.join(currentDir, "website")) &&
-      fs.existsSync(path.join(currentDir, "website", "content-tags.yml"))
+      fs.existsSync(path.join(currentDir, "website", "content-config", "content-tags.yml"))
     ) {
       return currentDir;
     }
@@ -20,9 +20,10 @@ function findRepoRoot(startDir) {
 }
 
 const repoRoot = findRepoRoot(process.cwd());
-const tagsPath = path.join(repoRoot, "website", "content-tags.yml");
-const contentUpdatesPath = path.join(repoRoot, "website", "content-updates.yml");
-const announcementsPath = path.join(repoRoot, "website", "announcements.yml");
+const contentConfigPath = path.join(repoRoot, "website", "content-config");
+const tagsPath = path.join(contentConfigPath, "content-tags.yml");
+const contentUpdatesPath = path.join(contentConfigPath, "content-updates.yml");
+const announcementsPath = path.join(contentConfigPath, "announcements.yml");
 const repositoryUrl = (process.env.PUBLIC_REPOSITORY_URL ?? "https://github.com/AnandKumar9/skills-repo").replace(
   /\/$/,
   "",
